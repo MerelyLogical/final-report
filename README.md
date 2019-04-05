@@ -1,22 +1,9 @@
-# Interim Report
+# Final Report
 
-## TODO:
-- [ ] `git grep REVISIT`
-- [x] Contact Kan Shi for his testbench
-- [x] Work done to date
-- [x] Structure shift, break up Chapter III, highlight TB comparison early
-- [x] Acronym check
-- [x] Explain buffer in interface in Clock domain section
-- [ ] Find motivation for high radix on FPGA
-- [x] Consider buffering test to on-chip memory
-
-
-## Notes:
-- ~free license has limitations, slower, less fpga support etc.~
-- ~imperial has academic license~
-- ~the Zed board -> similar capabilities~
-- another board with better power management
-- ~with HPS, self-contained. more accessible later on. less setup. 
-  complete product.~
-- maybe turning tax in serial vs parallel operators?
-- Intel at Arith gave ASIC with high radix paper
+- [ ] Fibonacci vs Galois LFSRs
+- [ ] Vertical vs Horizontal LFSRs
+- [ ] LSFRs and drivers fixed on `clk_dut` vs complex driver filter on `clk_tb`
+- [ ] Sub monitors on `clk_tb` vs on a divided `clk_dut`
+- [ ] Not actually an arbiter, more like an inverse multiplexer since there is no request or grant signals
+- [ ] Sub monitors designed to be identical to DUT. This way monitor module can just do the inverse multiplexer and comparisons other wrapping functions.
+- [ ] Latency of each module should be analysed, especially the consistency. If not consistent, how robust is the system?
