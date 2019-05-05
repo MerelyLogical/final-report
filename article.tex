@@ -1,4 +1,4 @@
-\documentclass[11pt]{article}
+\documentclass[12pt]{article}
 \usepackage[margin=2cm]{geometry}
 \usepackage{cite}
 \usepackage{float}
@@ -13,36 +13,63 @@
 \usepackage{bm,times}
 \usepackage{pgfgantt}
 \usepackage{indentfirst}
+\usepackage{array}
 \begin{document}
 
-\title{%
-  A High-radix Online Arithmetic Verification System\\
-  \large Final Year Project 1800478: Final Report (Draft)}
-\author{Zifan Wang, 01077639\\Imperial College London}
+\begin{titlepage}
+  \setlength{\parindent}{0pt}
+  \setlength{\parskip}{0pt}
+
+  { \Large
+    Imperial College London\\[17pt]
+    Department of Electrical and Electronic Engineering\\[17pt]
+    Final Year Project Report (DRAFT)
+  }
+
+  \rule{\columnwidth}{3pt}
+  \vfill
+  \centering
+  \includegraphics[width=0.8\columnwidth]{img/placeholder.png}
+  \vfill
+
+  \begin{table}[h]
+  \def\arraystretch{1.8}
+    \begin{tabular}{p{40mm}p{\dimexpr\columnwidth-40mm}}
+      Project Title: & \textbf{A High-radix Online Arithmetic Verification System} \\
+      Student:       & \textbf{Zifan Wang} \\
+      CID:           & \textbf{01077639} \\
+      Course:        & \textbf{EEE4} \\
+      Project Supervisor: & \textbf{Dr. James J. Davis} \\
+      Second Marker: & \textbf{Dr. Christos Bouganis}
+    \end{tabular}
+  \end{table}
+\end{titlepage}
+
 
 % \markboth{2018-2019}{?}
-\maketitle
 \setcounter{tocdepth}{2}
 \tableofcontents
 
 \newpage
 
-% \begin{abstract}
-% \end{abstract}
+\begin{abstract}
+  Nice abstract
+\end{abstract}
 
-% \input{interim/introduction}
-% \input{interim/research}
-% \newpage
-% \input{interim/projectSpec}
-% \newpage
-% \input{interim/engResearch}
-% \newpage
-% \input{interim/implementation}
-% \newpage
-% \input{interim/evaluation}
-% \newpage
-% \input{interim/concerns}
-% \input{interim/conclusion}
+\section{Introduction}
+\section{Background}
+  \input{tex/placeholder}
+\section{Requirements Capture}
+  \input{tex/placeholder}
+\section{Analysis and Design}
+  \input{tex/placeholder}
+\section{Implementation}
+\section{Testing}
+\section{Results}
+\section{Evaluation}
+\section{Conclusion}
+\section{Further Work}
+\section{User Guide}
 
 \newpage
 \appendix
