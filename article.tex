@@ -10,6 +10,8 @@
 \usepackage{url}
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows}
+\usepackage{tikz-timing}
+\usetikztiminglibrary[new={char=Q,reset char=R}]{counters}
 \usepackage{bm,times}
 \usepackage{pgfgantt}
 \usepackage{indentfirst}
@@ -58,11 +60,38 @@
 
 \section{Introduction}
 \section{Background}
-  \input{tex/placeholder}
 \section{Requirements Capture}
-  \input{tex/placeholder}
 \section{Analysis and Design}
-  \input{tex/placeholder}
+\begin{figure}[h]
+  \begin{tikztimingtable}[xscale=1.8,timing/d/background/.style={fill=white}]
+            CPOL=0 & LL 15{C} CL \\
+            CPOL=1 & HH 15{C} CH \\
+                   & H 17L H     \\
+    \\
+          Cycle \# & U     R 8{2Q} 2U    \\
+              MISO & D{z}  R 8{2Q} 2D{z} \\
+              MOSI & D{z}  R 8{2Q} 2D{z} \\
+    \\
+          Cycle \# & UU    R 8{2Q} U    \\
+              MISO & D{z}U R 8{2Q} D{z} \\
+              MOSI & D{z}U R 8{2Q} D{z} \\
+  \extracode
+    % Add vertical lines in two colors
+    \begin{pgfonlayer}{background}
+      \begin{scope}[semitransparent,semithick]
+        \vertlines{1,2,...,18}
+      \end{scope}
+    \end{pgfonlayer}
+    % Add big group labels
+    \begin{scope}
+      [font=\sffamily\Large,shift={(-4,0)},anchor=east]
+      \node at (  0, 0 ) {SCK};
+      \node at (  0,-3 ) {SS};
+      \node at (  0,-9 ) {CPHA=0};
+      \node at (  0,-17) {CPHA=1};
+    \end{scope}
+  \end{tikztimingtable}
+\end{figure}
 \section{Implementation}
 \section{Testing}
 \section{Results}
