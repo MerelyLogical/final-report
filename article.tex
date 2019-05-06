@@ -16,37 +16,9 @@
 \usepackage{pgfgantt}
 \usepackage{indentfirst}
 \usepackage{array}
+
 \begin{document}
-
-\begin{titlepage}
-  \setlength{\parindent}{0pt}
-  \setlength{\parskip}{0pt}
-
-  { \Large
-    Imperial College London\\[17pt]
-    Department of Electrical and Electronic Engineering\\[17pt]
-    Final Year Project Report (DRAFT)
-  }
-
-  \rule{\columnwidth}{3pt}
-  \vfill
-  \centering
-  \includegraphics[width=0.7\columnwidth]{img/1.jpg}
-  \vfill
-
-  \begin{table}[h]
-  \def\arraystretch{1.8}
-    \begin{tabular}{p{40mm}p{\dimexpr\columnwidth-40mm}}
-      Project Title: & \textbf{A High-radix Online Arithmetic Verification System} \\
-      Student:       & \textbf{Zifan Wang} \\
-      CID:           & \textbf{01077639} \\
-      Course:        & \textbf{EEE4} \\
-      Project Supervisor: & \textbf{Dr. James J. Davis} \\
-      Second Marker: & \textbf{Dr. Christos Bouganis}
-    \end{tabular}
-  \end{table}
-\end{titlepage}
-
+\input{tex/titlepage}
 
 % \markboth{2018-2019}{?}
 \setcounter{tocdepth}{2}
@@ -63,34 +35,10 @@
 \section{Requirements Capture}
 \section{Analysis and Design}
 \begin{figure}[h]
-  \begin{tikztimingtable}[xscale=1.8,timing/d/background/.style={fill=white}]
-            CPOL=0 & LL 15{C} CL \\
-            CPOL=1 & HH 15{C} CH \\
-                   & H 17L H     \\
-    \\
-          Cycle \# & U     R 8{2Q} 2U    \\
-              MISO & D{z}  R 8{2Q} 2D{z} \\
-              MOSI & D{z}  R 8{2Q} 2D{z} \\
-    \\
-          Cycle \# & UU    R 8{2Q} U    \\
-              MISO & D{z}U R 8{2Q} D{z} \\
-              MOSI & D{z}U R 8{2Q} D{z} \\
-  \extracode
-    % Add vertical lines in two colors
-    \begin{pgfonlayer}{background}
-      \begin{scope}[semitransparent,semithick]
-        \vertlines{1,2,...,18}
-      \end{scope}
-    \end{pgfonlayer}
-    % Add big group labels
-    \begin{scope}
-      [font=\sffamily\Large,shift={(-4,0)},anchor=east]
-      \node at (  0, 0 ) {SCK};
-      \node at (  0,-3 ) {SS};
-      \node at (  0,-9 ) {CPHA=0};
-      \node at (  0,-17) {CPHA=1};
-    \end{scope}
-  \end{tikztimingtable}
+  \centering
+  \input{tex/illu-example}
+  \caption{Example Timing Diagram}
+  \label{ExTD}
 \end{figure}
 \section{Implementation}
 \section{Testing}
