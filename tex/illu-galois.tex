@@ -1,0 +1,42 @@
+\begin{tikzpicture}
+  [
+    x=1em, y=1em,
+    start chain = going right,
+    node distance = 0em,
+    reg/.style =
+      {draw, minimum width=2em, minimum height=2em, outer sep=0pt, on chain},
+    spa/.style =
+      {minimum width=3em, minimum height=2em, outer sep=0pt, on chain},
+    every join/.style={-, thick}
+  ]
+  \node [reg] at (0, 0) (1) {1};
+  \node [reg] (2) {};
+  \node [reg] (3) {};
+  \node [reg] (4) {4};
+  \node [spa] ()  {};
+  \node [reg] (5) {5};
+  \node [spa] ()  {};
+  \node [reg] (6) {6};
+  \node [spa] ()  {};
+  \node [reg] (7) {};
+  \node [reg] (8) {8};
+
+  \node[xor gate US,draw,rotate=180] at  (8.5, 0) (a) {};
+  \node[xor gate US,draw,rotate=180] at (13.5, 0) (b) {};
+  \node[xor gate US,draw,rotate=180] at (18.5, 0) (c) {};
+
+  \draw (1.west) -| (-2, -2) -- (25,-2) |- (8.east);
+
+  \draw  (9.7,-2) |- (a.input 1);
+  \draw (14.7,-2) |- (b.input 1);
+  \draw (19.7,-2) |- (c.input 1);
+
+  \draw (a.input 2-|5.west) -- (a.input 2);
+  \draw (b.input 2-|6.west) -- (b.input 2);
+  \draw (c.input 2-|7.west) -- (c.input 2);
+
+  \draw (a.output) -- (4.east);
+  \draw (b.output) -- (5.east);
+  \draw (c.output) -- (6.east);
+
+\end{tikzpicture}

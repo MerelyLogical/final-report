@@ -1,0 +1,60 @@
+\section{System-level Design}
+
+\subsection{Testbench Architecture}
+\subsection{User Interface}
+
+\section{Hardware Design Choices}
+
+
+\subsection{Randomiser}
+With relatively low effort, random testing can provide significant coverage and discover relatively subtle errors~\cite{Duran1}.
+LFSRs are a reliable way of generating pseudorandom numbers quickly with low cost~\cite{Hazwani1}.
+\subsubsection{LFSR Configurations}
+
+An 8-bit LFSR has taps at [8,6,5,4].
+
+\textit{Fibonacci} --
+Classical option, easier to write and scale in hardware.
+
+\begin{figure}[ht]
+  \centering
+  \input{tex/illu-fibonacci}
+  \caption{Fibonacci Configuration}
+  \label{FibLFSR}
+\end{figure}
+
+\textit{Galois} --
+Harder to write if variable length is desired, but faster in hardware.
+
+\begin{figure}[ht]
+  \centering
+  \input{tex/illu-galois}
+  \caption{Galois Configuration}
+  \label{GalLFSR}
+\end{figure}
+
+\textit{Xorshift} --
+Interesting, but seems quite bad in hardware~\cite{Marsaglia1}.
+
+\subsubsection{LFSR Structure}
+
+\textit{Vertical} --
+Nice randomness, more scalable, need to seed all the LFSRs differently.
+
+\textit{Horizontal} --
+Easy to build, easy to test with.
+
+\subsection{Driver}
+\subsubsection{Dual Driver System}
+One driver focusses on fast stress tests,
+The other allows handwritten tests to coexist with random tests.
+They can be switched in software.
+
+\subsection{Monitor}
+
+
+\subsection{Scoreboard}
+
+\section{Software Design Choices}
+
+\subsection{Code Structure}

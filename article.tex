@@ -9,7 +9,23 @@
 \usepackage{amsfonts}
 \usepackage{url}
 \usepackage{tikz}
-\usetikzlibrary{shapes,arrows}
+\usetikzlibrary{shapes,shapes.gates.logic.US,arrows,chains,calc}
+\tikzset{
+  -|-/.style={
+    to path={
+      (\tikztostart) -| ($(\tikztostart)!#1!(\tikztotarget)$) |- (\tikztotarget)
+      \tikztonodes
+    }
+  },
+  -|-/.default=0.5,
+  |-|/.style={
+    to path={
+      (\tikztostart) |- ($(\tikztostart)!#1!(\tikztotarget)$) -| (\tikztotarget)
+      \tikztonodes
+    }
+  },
+  |-|/.default=0.5,
+}
 \usepackage{tikz-timing}
 \usetikztiminglibrary[new={char=Q,reset char=R}]{counters}
 \usepackage{bm,times}
@@ -36,63 +52,9 @@
 
 \section{Requirements Capture}
 
-\section{Analysis and Design}
+\input{tex/design}
 
-\section{Implementation}
-
-\subsection{Randomiser}
-\subsubsection{Fibonacci vs Galois}
-\subsubsection{Vertical vs Horizontal}
-
-\subsection{Driver}
-\subsubsection{Dual Driver System}
-\subsubsection{Delay Tester}
-
-I built a delay tester to find out the delay of the DUT.
-With a 3-bit counter as shown in the timing diagram, it can measure this delay for up to 8 clock cycles.
-
-\begin{figure}[ht]
-  \centering
-  \input{tex/illu-delay_tester}
-  \caption{3-bit Delay Tester FSM}
-  \label{DelayTester}
-\end{figure}
-Testing with 0 is safe since LSFR will never output 0.
-
-\subsection{Monitor}
-\subsubsection{Sub Monitors}
-
-\begin{figure}[ht]
-  \centering
-  \begin{tikztimingtable}
-    [
-      xscale=4,
-      timing/d/background/.style={fill=white},
-      timing/font=\ttfamily
-    ]
-    dist\_ctr & D{8} 2{D{1}D{2}D{4}D{8}} D{1}D{2}         \\
-    a & U D{AA}D{AB}D{AC}D{AD}D{AE}D{AF}D{AG}D{AH}D{AI} U \\
-    b & U D{BA}D{BB}D{BC}D{BD}D{BE}D{BF}D{BG}D{BH}D{BI} U \\
-    s & 3U D{SA}D{SB}D{SC}D{SD}D{[red]SK}D{SF}D{SG}D      \\
-    \\
-    dist\_ctr  [0] & L 2{H 3L} HL \\
-    a\_mon     [0] & U 4D{AA} 4D{AE} 2D{AI} \\
-    b\_mon     [0] & U 4D{BA} 4D{BE} 2D{BI} \\
-    s\_mon     [0] & 2U 4D{SA} 4D{SE} D \\
-    sub\_event [0] & 8LH2L \\
-  \extracode
-    % Add vertical lines in two colors
-    \begin{pgfonlayer}{background}
-      \begin{scope}[semitransparent,semithick]
-        \vertlines{1,2,...,10}
-      \end{scope}
-    \end{pgfonlayer}
-  \end{tikztimingtable}
-  \caption{Distributed Monitoring System}
-  \label{DisMon}
-\end{figure}
-
-\subsection{Scoreboard}
+\input{tex/implementation}
 
 \section{Testing}
 
@@ -111,6 +73,6 @@ Testing with 0 is safe since LSFR will never output 0.
 
 % \input{appendix}
 
-\input{interim/bibliography}
+\input{tex/bibliography}
 
 \end{document}
