@@ -1,0 +1,15 @@
+\begin{tikzpicture}
+  [
+    x=1em, y=1em
+  ]
+  \node at (-1.5, 0) {\texttt{out}};
+  \node [draw,minimum height=1em, minimum width=10em] at (5, 0) (o) {};
+  \foreach \pos [count=\idx] in {0.5, 2.5, 4.5, 9.5}{
+    \node [draw,minimum height=1em, minimum width=5em, rotate around={90:(0, 0)}] at (\pos, 5) (\idx) {\scriptsize \texttt{LFSR}};
+    \draw [->, >=stealth] (\idx.west) -- (\idx.west|-o.north);
+    \draw [->, >=stealth] ($(\idx.west)-(0, 0.5)$) -| (\pos-1,8) -| (\idx.east);
+  }
+
+  \draw [dotted, thick] (6, 5) -- (7.5, 5);
+
+\end{tikzpicture}

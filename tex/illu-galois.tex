@@ -1,7 +1,7 @@
 \begin{tikzpicture}
   [
     x=1em, y=1em,
-    start chain = going right,
+    start chain = going left,
     node distance = 0em,
     reg/.style =
       {draw, minimum width=2em, minimum height=2em, outer sep=0pt, on chain},
@@ -9,34 +9,34 @@
       {minimum width=3em, minimum height=2em, outer sep=0pt, on chain},
     every join/.style={-, thick}
   ]
-  \node [reg] at (0, 0) (1) {1};
+  \node [reg] at (0, 0) (1) {\texttt{0}};
   \node [reg] (2) {};
   \node [reg] (3) {};
-  \node [reg] (4) {4};
+  \node [reg] (4) {\texttt{3}};
   \node [spa] ()  {};
-  \node [reg] (5) {5};
+  \node [reg] (5) {\texttt{4}};
   \node [spa] ()  {};
-  \node [reg] (6) {6};
+  \node [reg] (6) {\texttt{5}};
   \node [spa] ()  {};
   \node [reg] (7) {};
-  \node [reg] (8) {8};
+  \node [reg] (8) {\texttt{7}};
 
-  \node[xor gate US,draw,rotate=180] at  (8.5, 0) (a) {};
-  \node[xor gate US,draw,rotate=180] at (13.5, 0) (b) {};
-  \node[xor gate US,draw,rotate=180] at (18.5, 0) (c) {};
+  \node [xor gate US,draw] at  (-8.4, 0) (a) {};
+  \node [xor gate US,draw] at (-13.4, 0) (b) {};
+  \node [xor gate US,draw] at (-18.4, 0) (c) {};
 
-  \draw (1.west) -| (-2, -2) -- (25,-2) |- (8.east);
+  \draw [->, >=stealth] (1.east) -| (2, -2) -- (-25,-2) |- (8.west);
 
-  \draw  (9.7,-2) |- (a.input 1);
-  \draw (14.7,-2) |- (b.input 1);
-  \draw (19.7,-2) |- (c.input 1);
+  \draw (a.input 1-|5.east) -- (a.input 1);
+  \draw (b.input 1-|6.east) -- (b.input 1);
+  \draw (c.input 1-|7.east) -- (c.input 1);
 
-  \draw (a.input 2-|5.west) -- (a.input 2);
-  \draw (b.input 2-|6.west) -- (b.input 2);
-  \draw (c.input 2-|7.west) -- (c.input 2);
+  \draw  (-9.7,-2) |- (a.input 2);
+  \draw (-14.7,-2) |- (b.input 2);
+  \draw (-19.7,-2) |- (c.input 2);
 
-  \draw (a.output) -- (4.east);
-  \draw (b.output) -- (5.east);
-  \draw (c.output) -- (6.east);
+  \draw (a.output) -- (4.west);
+  \draw (b.output) -- (5.west);
+  \draw (c.output) -- (6.west);
 
 \end{tikzpicture}

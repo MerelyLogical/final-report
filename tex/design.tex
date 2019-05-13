@@ -11,7 +11,7 @@ With relatively low effort, random testing can provide significant coverage and 
 LFSRs are a reliable way of generating pseudorandom numbers quickly with low cost~\cite{Hazwani1}.
 \subsubsection{LFSR Configurations}
 
-An 8-bit LFSR has taps at [8,6,5,4].
+To compare, we can examine an 8-bit LFSR with taps on bit [7,5,4,3].
 
 \textit{Fibonacci} --
 Classical option, easier to write and scale in hardware.
@@ -33,16 +33,30 @@ Harder to write if variable length is desired, but faster in hardware.
   \label{GalLFSR}
 \end{figure}
 
-\textit{Xorshift} --
-Interesting, but seems quite bad in hardware~\cite{Marsaglia1}.
+\textit{Others} --
+Other LFSR configurations such as Xorshift~\cite{Marsaglia1} exists, but they are much slower in hardware.
 
-\subsubsection{LFSR Structure}
+\subsubsection{Randomiser Structure}
+
+\textit{Horizontal} --
+Easy to build, easy to test with.
+
+\begin{figure}[ht]
+  \centering
+  \input{tex/illu-horilfsr}
+  \caption{Horizontal Structure}
+  \label{HoriLFSR}
+\end{figure}
 
 \textit{Vertical} --
 Nice randomness, more scalable, need to seed all the LFSRs differently.
 
-\textit{Horizontal} --
-Easy to build, easy to test with.
+\begin{figure}[ht]
+  \centering
+  \input{tex/illu-vertlfsr}
+  \caption{Vertical Structure}
+  \label{VertLFSR}
+\end{figure}
 
 \subsection{Driver}
 \subsubsection{Dual Driver System}
