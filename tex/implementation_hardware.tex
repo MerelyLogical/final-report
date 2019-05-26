@@ -1,0 +1,101 @@
+\section{Hardware Implementation}
+
+\subsection{Project Hierarchy}
+Before any engineering work was done towards the final product, a small module
+was built to learn the environment.
+This module needed to be simple yet covered enough grounds to provide as much
+learning during the process as possible without taking up too much actual
+development time towards the product.
+As the greatest unfamiliarity was with the interaction across the HPS-FPGA
+bridge, a simple hardware accelerated adder was made for this training.
+
+\subsubsection{FPGA Side}
+Programming the FPGA to communicate with the HPS is no trivial task.
+Luckily, there exists a golden system reference design~\cite{Rocket1} for
+the board in use for this project.
+Unfortunately, support for certain versions of Quartus are missing from
+the GSRD download database, including the one used for this project, 16.0.
+While the design can be opened with a different version of the software,
+it causes a series of conflicts usually related to using IP cores that
+have changed over the iterations.
+To circumvent this issue cleanly, GSRD version 14.1 was downloaded and compiled
+on a separate install of Quartus II 14.1.
+This allowed the reference design to be studied in detail, and the sections
+required for this project to be rebuilt with Quartus Prime 16.0.
+
+From the perspective of the FPGA, The HPS exposes three bridges for
+connections~\cite{Altera6}.
+As this is a relatively simple task, the lightweight bridge was used.
+Module \texttt{altera\_hps} exposes the master of this bridge as
+\texttt{h2f\_lw\_axi\_master}.
+Next, the actual hardware adder was built and integrated as a hardware
+module in Qsys with a matching interface.
+A simple adder can produce its result after one clock cycle.
+This greatly simplifies the logic required for the Avalon slave interface.
+The logic for the control and data signals were thus written according to the
+interface specifications~\cite{Intel3}.
+Following the naming conventions for the signals allows Qsys Component Editor
+to automatically detect the Avalon slave from this module at analysis.
+This saves the troubles of editing the \texttt{\_hw.tcl} file.
+To experiment with module configuration, the adder was designed with variable
+width.
+
+The adder was then instantiated and connected to the rest of the system with
+two clicks in Qsys.
+From there, Qsys could generate the HDL for the entire system, which was then
+compiled to a bitstream file.
+With the bitstream ready, the work now shifted to the HPS.
+
+\subsection{Randomiser}
+
+\subsection{Driver}
+
+\subsubsection{Delay Tester}
+
+I built a delay tester to find out the delay of the DUT.
+With a 3-bit counter as shown in the timing diagram, it can measure this delay for up to 8 clock cycles.
+
+\begin{figure}[ht]
+  \centering
+  \input{tex/illu-delay_tester}
+  \caption{3-bit Delay Tester FSM}
+  \label{DelayTester}
+\end{figure}
+Testing with 0 is safe since LFSR will never output 0.
+
+\subsubsection{Switching system}
+
+\subsection{Monitor}
+\subsubsection{Sub Monitors}
+
+\begin{figure}[ht]
+  \centering
+  \begin{tikztimingtable}
+    [
+      xscale=4,
+      timing/d/background/.style={fill=white},
+      timing/font=\ttfamily
+    ]
+    dist\_ctr & D{8} 2{D{1}D{2}D{4}D{8}} D{1}D{2}         \\
+    a & U D{AA}D{AB}D{AC}D{AD}D{AE}D{AF}D{AG}D{AH}D{AI} U \\
+    b & U D{BA}D{BB}D{BC}D{BD}D{BE}D{BF}D{BG}D{BH}D{BI} U \\
+    s & 3U D{SA}D{SB}D{SC}D{SD}D{[red]SK}D{SF}D{SG}D      \\
+    \\
+    dist\_ctr  [0] & L 2{H 3L} HL \\
+    a\_mon     [0] & U 4D{AA} 4D{AE} 2D{AI} \\
+    b\_mon     [0] & U 4D{BA} 4D{BE} 2D{BI} \\
+    s\_mon     [0] & 2U 4D{SA} 4D{SE} D \\
+    sub\_event [0] & 8LH2L \\
+  \extracode
+    % Add vertical lines in two colors
+    \begin{pgfonlayer}{background}
+      \begin{scope}[semitransparent,semithick]
+        \vertlines{1,2,...,10}
+      \end{scope}
+    \end{pgfonlayer}
+  \end{tikztimingtable}
+  \caption{Distributed Monitoring System}
+  \label{DisMon}
+\end{figure}
+
+\subsection{Scoreboard}

@@ -1,0 +1,83 @@
+\section{Evaluation}
+
+\subsection{Product Metrics}
+
+\subsubsection{Robustness}
+The next few measures looks at the performance of the final product.
+First, the maximum stress of which the testbench can provide without failing is
+a good metric.
+This can be quantitatively measured by the maximum data throughput across the
+DUT, and the maximum frequency that the DUT can be running where the testbench
+remains reliable.
+A robust testbench with a higher maximum frequency can reveal a wider picture
+in the performance of the DUT.
+This would hopefully allow more insights to be gained regarding the DUT, or
+it could mean that the testbench can be used for future designs that may be
+faster than the current one.
+As the main quantitative metric, this will be a vital indicator of the
+project's success.
+
+\subsubsection{Flexibility}
+The flexibility of the testbench is also vital to the product's performance.
+The testbench should suitable for a range of DUTs.
+This will allow the testbench to be used for future experiments.
+The flexibility can be measured by the number of configurable parameters that
+it has, and the range of which these parameters can be adjusted to.
+
+\subsubsection{User-friendliness}
+The ease of use of the testbench can be another evaluation point.
+On the hardware side, the verification system can be packaged into a Qsys
+module.
+Given the DUT is also a module with an agreed interface, it can easily be
+connected in Qsys for testing.
+On the software side, a user-friendly interface could be built.
+A usable command line interface may be good enough, but a simple graphic
+interface could make the tests much more visual and informative.
+
+The interface could also provide information on the failure in the DUT.
+A better testbench will provide more insightful details when the DUT fails.
+This would make debugging or evaluating the design much simpler.
+Along with the GUI, this project has many optional extensions that would be
+discussed further in section 6.2.
+After the main goal of the project being met, the number of optional functions
+implemented becomes a good measure of the progress of the project.
+
+\subsubsection{Note}
+A noteworthy point in evaluation is regarding the progress of the sister project.
+The purpose of the testbench is to verify and stress arithmetic designs.
+If these designs are not available near the end of this project,
+it would be difficult to empirically prove the capabilities of the testbench
+and its surrounding system.
+Since the project comprises a verification system, the results from the
+benchmarks should not be used for evaluation of this project.
+It is not impossible, as there are still substitutes for them.
+For functional purposes, standard off-the-shelf arithmetic modules could be
+used in-lieu.
+For other purposes, it is possible to have a model done before the actual design
+starts in the paired project.
+While this would allow this project to progress, it would be extra work
+for the other project.
+In all, it would be nice to have a solid arithmetic module completely to run
+in this testbench, but without one, the system can still be built and completed,
+albeit generating less useful data towards the overall aim of the project.
+
+\subsection{Project Metrics}
+\subsubsection{Implementation Plan}
+One natural way of measuring the success of the project is to look at the actual
+progress and compare it to the implementation plan.
+It should be noted that no plan is perfect, so some deviation is allowed.
+However, if there is significant delay from the plan, there must be
+justifications given.
+
+\subsubsection{Fallbacks and Extensions}
+The fallbacks and extensions were detailed in the implementation plan.
+The progression of these extension tasks can be used as a point of evaluation
+to the project.
+This is already reflected in the product metrics, as 6.1.2 and 6.1.3 examines
+mainly the success of the extension tasks, while only 6.1.1 analyses the
+achievements of the core task.
+However, this does not mean that this project will be completely sealed if
+all extension tasks are complete before the final deadline, there is always
+more potential for future work.
+In the very unlikely case that the project progresses to such a state, new ideas
+such as dynamic voltage scaling will be drafted and evaluated.
