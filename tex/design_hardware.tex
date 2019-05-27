@@ -1,110 +1,72 @@
 \section{Hardware Design Choices}
 
 \subsection{Data Transfer Rate}
-In order to stress the DUT, the verification system must perform at a much
-higher frequency than the expected frequency of the DUT.
-Assuming the DUT is to run at 300MHz, to fully explore the effect of
-overclocking, the testbench must be able to run at double the frequency or
-higher.
+In order to stress the DUT, the verification system must perform at a much higher frequency than the expected frequency of the DUT.
+Assuming the DUT is to run at 300MHz, to fully explore the effect of overclocking, the testbench must be able to run at double the frequency or higher.
 This gives a target frequency of 800MHz.
-Assuming a data width of 32-bit, the target data transfer rate is then 
-estimated to be 25.6Gbps.
+Assuming a data width of 32-bit, the target data transfer rate is then estimated to be 25.6Gbps.
 
 \subsubsection{\textbf{HPS-FPGA Bridge}}
-As the testing is to be controlled by the HPS, the HPS-FPGA bridge will be the
-immediate bottleneck if the test data is to flow from HPS to FPGA.
-While the HPS can easily generate test data with a piece of software,
-there is a large amount of overhead as data crosses from one architecture
-to another.
-This overhead exists in the form of both decreased bandwidth and increased
-delay.
+As the testing is to be controlled by the HPS, the HPS-FPGA bridge will be the immediate bottleneck if the test data is to flow from HPS to FPGA.
+While the HPS can easily generate test data with a piece of software, there is a large amount of overhead as data crosses from one architecture to another.
+This overhead exists in the form of both decreased bandwidth and increased delay.
 Thus, it is not be sensible for the HPS to send out data during runtime.
 
 \subsubsection{\textbf{Off-chip DDR SDRAM}}
-Another thought may be to first populate the off-chip DDR SDRAM on the FPGA
-side, then feed that data to the DUT during test.
+Another thought may be to first populate the off-chip DDR SDRAM on the FPGA side, then feed that data to the DUT during test.
 This is already much faster than passing the data directly from HPS.
 The 1GB, 32-bit wide DDR3 on the FPGA side is rated at 400MHz.
 With double rate transfer, this gives a maximum transfer rate of 25.6Gbps.
 
-Although using the off-chip RAM may theoretically achieve the targets,
-it still has its disadvantages.
+Although using the off-chip RAM may theoretically achieve the targets, it still has its disadvantages.
 Firstly, the process of filling up the memory takes time.
-Thus, the testing would be broken up into bursts, with time in between for
-checking results and filling in new data.
-The complexity of the SDRAM interface also requires an SDRAM controller to be
-used to manage SDRAM refresh cycles, address multiplexing and interface timing.
+Thus, the testing would be broken up into bursts, with time in between for checking results and filling in new data.
+The complexity of the SDRAM interface also requires an SDRAM controller to be used to manage SDRAM refresh cycles, address multiplexing and interface timing.
 These all add up to significant access latency.
-While it could be overcome with burst and piplined accesses,
-it would further complicate the SDRAM controller.
-A controller is provided by Intel~\cite{Altera3}, but it would consume
-a non-negligible amount of the limited FPGA resources while adding
-unnecessary complexities to the design.
-Customising or building a new SDRAM controller to fit this project is possible,
-but needlessly time-consuming.
+While it could be overcome with burst and piplined accesses, it would further complicate the SDRAM controller.
+A controller is provided by Intel~\cite{Altera3}, but it would consume a non-negligible amount of the limited FPGA resources while adding unnecessary complexities to the design.
+Customising or building a new SDRAM controller to fit this project is possible, but needlessly time-consuming.
 
 \subsubsection{\textbf{On-chip Memory}}
 The on-chip memory is much faster and simpler to use.
-In comparison, this memory is implemented on the FPGA itself, and thus needs
-no external connections for accesses.
+In comparison, this memory is implemented on the FPGA itself, and thus needs no external connections for accesses.
 It has higher throughput and lower latency than the SDRAM.
-The memory transactions can also be piplined, giving one transaction per
-clock cycle.
-With an on-chip FIFO accessed in dual-port mode, the write operations at one
-end and the read operations at the other end can happen simultaneously.
-This feature is useful as tests are prepared and fed into the DUT, or when test
-results are collected and fed to the monitor.
+The memory transactions can also be piplined, giving one transaction per clock cycle.
+With an on-chip FIFO accessed in dual-port mode, the write operations at one end and the read operations at the other end can happen simultaneously.
+This feature is useful as tests are prepared and fed into the DUT, or when test results are collected and fed to the monitor.
 
 On-chip memory is not without its drawbacks.
 It is volatile like SDRAM and very limited in capacity.
-SDRAMs can have store about 1GB, while on-chip memory could only hold a few
-MB~\cite{Altera2}.
-Volatility is not exactly of concern in this project, but its small capacity
-means not much test data can be held before it needs more fed in.
+SDRAMs can have store about 1GB, while on-chip memory could only hold a few MB~\cite{Altera2}.
+Volatility is not exactly of concern in this project, but its small capacity means not much test data can be held before it needs more fed in.
 
 \subsubsection{\textbf{Distributed RAM / Registers}}
-On-chip memory has a minimum latency of 1 clock cycle as the R/W access gets
-processed.
+On-chip memory has a minimum latency of 1 clock cycle as the R/W access gets processed.
 If a even faster memory is desired, we can use LUTs or registers to store them.
 This option would eliminate the latency but takes up much more FPGA resources.
 The capacity is even more limited as LUTs are usually used for logic.
-There will be a significant amount of data generated during testing, and the
-testbench should be as lightweight as possible to allow flexibility in the DUTs.
+There will be a significant amount of data generated during testing, and the testbench should be as lightweight as possible to allow flexibility in the DUTs.
 As such, distributed RAM will not be used in this project for data transfer.
 Registers will still be used as they are essential for many other purposes.
 
 \subsection{Randomiser}
-To exploit the benefits of on-chip memory, and circumvent the drawback of
-buffering testing data generated from the HPS, a method for generating testing
-data at runtime, on the FPGA needs to be designed.
-As arithmetic operators have a vast set of valid inputs, it is necessary to
-have cost-effective test generation.
+To exploit the benefits of on-chip memory, and circumvent the drawback of buffering testing data generated from the HPS, a method for generating testing data at runtime, on the FPGA needs to be designed.
+As arithmetic operators have a vast set of valid inputs, it is necessary to have cost-effective test generation.
 
 A good choice here is to use random testing.
-With relatively low effort, random testing can provide significant coverage
-and discover relatively subtle errors~\cite{Duran1}.
-The main drawback of random testing is the possible lack of coverage for corner
-cases, for which the usual solution is to provide handwritten tests to
-complement it.
-However, as the main goal of this testbench is gauging the performance of
-the module, and not necessarily verifying the correctness of the module,
-having uncovered testing holes is acceptable during stress testing.
-As the project progress, special tests could be written and run separately
-with a relaxed timing restriction to cover the holes.
-It should be noted that certain corner cases may represent critical paths in
-the design.
-To combat this, the testbench provides the option to run handwritten inputs
-alongside random tests.
+With relatively low effort, random testing can provide significant coverage and discover relatively subtle errors~\cite{Duran1}.
+The main drawback of random testing is the possible lack of coverage for corner cases, for which the usual solution is to provide handwritten tests to complement it.
+However, as the main goal of this testbench is gauging the performance of the module, and not necessarily verifying the correctness of the module, having uncovered testing holes is acceptable during stress testing.
+As the project progress, special tests could be written and run separately with a relaxed timing restriction to cover the holes.
+It should be noted that certain corner cases may represent critical paths in the design.
+To combat this, the testbench provides the option to run handwritten inputs alongside random tests.
 
-LFSRs are a reliable way of generating pseudorandom numbers quickly with low
-cost~\cite{Hazwani1}.
+LFSRs are a reliable way of generating pseudorandom numbers quickly with low cost~\cite{Hazwani1}.
 They will thus form the starting point of data generation.
-While it is possible for data generated to be invalid as inputs to the DUT, this
-should not be the case for most benchmarks in this project.
+While it is possible for data generated to be invalid as inputs to the DUT, this should not be the case for most benchmarks in this project.
 Even if this is the case, they can be dealt later in the process by the monitor.
 
-By following this approach, the software would only need to configure the
-randomiser, and test data no longer needs to pass through the HPS-FPGA bridge.
+By following this approach, the software would only need to configure the randomiser, and test data no longer needs to pass through the HPS-FPGA bridge.
 Thus, the testbench can provide fast and constant data to stress the DUT.
 
 \subsubsection{LFSR Configurations}
@@ -158,45 +120,31 @@ Nice randomness, more scalable, need to seed all the LFSRs differently.
 
 \subsection{Driver}
 \subsubsection{Dual Driver System}
-One driver focusses on fast stress tests,
-The other allows handwritten tests to coexist with random tests.
+One driver focusses on fast stress tests, The other allows handwritten tests to coexist with random tests.
 They can be switched in software.
 
 \subsection{Monitor}
 
-Another concern in the system design is of the different clock domains that
-must exist on the FPGA.
-At a minimum, there need to be two clock domains: one surrounds the DUT and
-another supports the rest of the control logic around the DUT.
-These clock frequencies can be generated with PLLs, which are
-provided as IP Cores in the Quartus software~\cite{Altera4}.
+Another concern in the system design is of the different clock domains that must exist on the FPGA.
+At a minimum, there need to be two clock domains: one surrounds the DUT and another supports the rest of the control logic around the DUT.
+These clock frequencies can be generated with PLLs, which are provided as IP Cores in the Quartus software~\cite{Altera4}.
 A clock tree will distribute them to the individual modules.
 Data crossing clock domains will be fed through FIFOs to prevent loss.
 
-The proposed structure will have the bulk of the control logic running
-in a separate clock domain to the DUT.
-Only an interface with FIFOs will be running in synchronicity
-with the DUT.
-Therefore, the test controls can run at a slower frequency without
-bottlenecking the system, allowing the DUT to be stressed further.
-The problem now is to ensure the monitor can handle the stream of DUT output
-coming in at a higher frequency that it is running at.
-As the monitor needs to calculate the correct data before it can check if the
-DUT output is correct, it cannot keep up with the speed of the DUT.
+The proposed structure will have the bulk of the control logic running in a separate clock domain to the DUT.
+Only an interface with FIFOs will be running in synchronicity with the DUT.
+Therefore, the test controls can run at a slower frequency without bottlenecking the system, allowing the DUT to be stressed further.
+The problem now is to ensure the monitor can handle the stream of DUT output coming in at a higher frequency that it is running at.
+As the monitor needs to calculate the correct data before it can check if the DUT output is correct, it cannot keep up with the speed of the DUT.
 This report consider three alternatives.
 
 \subsubsection{Partial Monitors}
-A lightweight idea is to implement a parity checker instead of a full model
-inside the monitors.
-For example, to check an adder, the monitor can just check if the final bit
-with a LUT acting as a XOR gate.
+A lightweight idea is to implement a parity checker instead of a full model inside the monitors.
+For example, to check an adder, the monitor can just check if the final bit with a LUT acting as a XOR gate.
 
-Although this is reasonably fast, it cannot be extended once the DUT is faster
-than a parity calculation followed by a comparison.
-More critically, it provides no additional information once the DUT fails, and
-it has a 50\% rate of ignoring an error.
-If this is to be solved by increasing the number of bits checked, the problem
-returns back to its initial state.
+Although this is reasonably fast, it cannot be extended once the DUT is faster than a parity calculation followed by a comparison.
+More critically, it provides no additional information once the DUT fails, and it has a 50\% rate of ignoring an error.
+If this is to be solved by increasing the number of bits checked, the problem returns back to its initial state.
 Thus this method will not be experimented.
 
 \subsubsection{Lazy Monitors}
@@ -208,17 +156,12 @@ Thus this method will not be experimented.
   \label{LazMon}
 \end{figure}
 
-An more scalable alternative is to have the monitor only check a selection of
-data sets.
-For example, if the monitor is programmed to check every third test point,
-statistically it will make little difference to the final result.
-In case the DUT is aware of this and only produce correct outputs on every third
-operation, this process can be randomised too.
+An more scalable alternative is to have the monitor only check a selection of data sets.
+For example, if the monitor is programmed to check every third test point, statistically it will make little difference to the final result.
+In case the DUT is aware of this and only produce correct outputs on every third operation, this process can be randomised too.
 
-This method can be extended if the DUT get fast simply by skipping more checks,
-and it has the full information when it detects an error.
-However, this method needs the extra logic in the random controller, making the
-monitor slightly more complex than it probably should be.
+This method can be extended if the DUT get fast simply by skipping more checks, and it has the full information when it detects an error.
+However, this method needs the extra logic in the random controller, making the monitor slightly more complex than it probably should be.
 
 \subsubsection{Parallel Monitors}
 
@@ -229,33 +172,23 @@ monitor slightly more complex than it probably should be.
   \label{ParMon}
 \end{figure}
 
-As the test data is uniform, the monitor can be parallelised in to a number of
-sub-monitors.
+As the test data is uniform, the monitor can be parallelised in to a number of sub-monitors.
 The sub-monitors is connected to a arbiter that is connected to three FIFOs.
 The FIFOs are the inputs and the output of the DUT.
 A round robin arbiter distributes the data to the sub-monitors equally.
 The results from each sub-monitor are then sent to a single scoreboard.
-To avoid potential hazards, the output from the sub-monitors will be buffered
-before processed by the scoreboard.
+To avoid potential hazards, the output from the sub-monitors will be buffered before processed by the scoreboard.
 
-This does not have data dependency on a random controller, and it can
-fully guarantee the correctness of the DUT.
-It is also scalable as more sub-monitors can be added it the DUT fills up its
-output buffer.
-As a downside, this method takes up the most FPGA resources to implement as it
-scales.
+This does not have data dependency on a random controller, and it can fully guarantee the correctness of the DUT.
+It is also scalable as more sub-monitors can be added it the DUT fills up its output buffer.
+As a downside, this method takes up the most FPGA resources to implement as it scales.
 
-Comparing across the three methods, the parallel monitors will be built first
-for this project, as it offers the best functionalities.
-Although unlikely, if a fatal issue arises in this design, or if the testbench
-needs to be more lightweight, then the lazy monitor will be used as the
-alternative.
+Comparing across the three methods, the parallel monitors will be built first for this project, as it offers the best functionalities.
+Although unlikely, if a fatal issue arises in this design, or if the testbench needs to be more lightweight, then the lazy monitor will be used as the alternative.
 
 \subsection{Scoreboard}
 
-If the monitor detects an interesting event such as an error, it will send
-a message to the scoreboard.
-The scoreboard has counters tracking these events, which are exposed and can be
-read by the HPS.
+If the monitor detects an interesting event such as an error, it will send a message to the scoreboard.
+The scoreboard has counters tracking these events, which are exposed and can be read by the HPS.
 
 The software can run statistics to provide further insights to the user.

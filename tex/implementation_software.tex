@@ -1,33 +1,19 @@
 \section{Software Implementation}
 
 \subsubsection{HPS Side}
-The HPS runs Ubuntu and a Bash script has been written to load the bitstream
-onto the FPGA.
+The HPS runs Ubuntu and a Bash script has been written to load the bitstream onto the FPGA.
 Next, a program was written in Python to test the hardware design from the HPS.
-The interfaces are mapped onto the physical memory, thus they can be accessed
-by opening \texttt{/dev/mem}.
-Checking against the specifications~\cite{Altera6}, the lightweight master is
-at \texttt{0xFF20\_0000}.
-Qsys allocates the memory spaces of modules relatively, so when it reports
-that the adder has been placed at \texttt{0x0010\_0000}, it is physically at
-\texttt{0xFF30\_0000}.
-The adder was designed to have its two inputs at \texttt{0x00} and
-\texttt{0x10} and its output at \texttt{0x20}, which were assigned by Qsys
-relatively to \texttt{0xFF30\_0000}.
+The interfaces are mapped onto the physical memory, thus they can be accessed by opening \texttt{/dev/mem}.
+Checking against the specifications~\cite{Altera6}, the lightweight master is at \texttt{0xFF20\_0000}.
+Qsys allocates the memory spaces of modules relatively, so when it reports that the adder has been placed at \texttt{0x0010\_0000}, it is physically at \texttt{0xFF30\_0000}.
+The adder was designed to have its two inputs at \texttt{0x00} and \texttt{0x10} and its output at \texttt{0x20}, which were assigned by Qsys relatively to \texttt{0xFF30\_0000}.
 
-With the memory mapping understood, the program was designed to closely
-mirror this relative relationship between the modules using classes.
-For example, the adder defines its output at \texttt{0x20}, but its read and
-write methods are inherited from an AXI class that brings it to the
-correct physical address by adding the address of the bridge defined in it.
-This parallel between software and hardware should be helpful as the product
-gets more complex.
+With the memory mapping understood, the program was designed to closely mirror this relative relationship between the modules using classes.
+For example, the adder defines its output at \texttt{0x20}, but its read and write methods are inherited from an AXI class that brings it to the correct physical address by adding the address of the bridge defined in it.
+This parallel between software and hardware should be helpful as the product gets more complex.
 
-To verify what I have built and learnt was correct, 1000 add operations were
-executed separately with and without the hardware acceleration of the FPGA.
+To verify what I have built and learnt was correct, 1000 add operations were executed separately with and without the hardware acceleration of the FPGA.
 The results were compared and confirmed that this training module worked.
-While called hardware acceleration, the FPGA actually had worse performance
-than the HPS in this testing case.
-The CPU is reasonably efficient in calculating additions, while calculating
-on the FPGA requires the adder I/O data going through the HPS-FPGA bridge.
+While called hardware acceleration, the FPGA actually had worse performance than the HPS in this testing case.
+The CPU is reasonably efficient in calculating additions, while calculating on the FPGA requires the adder I/O data going through the HPS-FPGA bridge.
 This incurs a significant overhead, thus slowing it down.

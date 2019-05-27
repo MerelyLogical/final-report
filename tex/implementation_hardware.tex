@@ -1,49 +1,32 @@
 \section{Hardware Implementation}
 
 \subsection{Project Hierarchy}
-Before any engineering work was done towards the final product, a small module
-was built to learn the environment.
-This module needed to be simple yet covered enough grounds to provide as much
-learning during the process as possible without taking up too much actual
-development time towards the product.
-As the greatest unfamiliarity was with the interaction across the HPS-FPGA
-bridge, a simple hardware accelerated adder was made for this training.
+Before any engineering work was done towards the final product, a small module was built to learn the environment.
+This module needed to be simple yet covered enough grounds to provide as much learning during the process as possible without taking up too much actual development time towards the product.
+As the greatest unfamiliarity was with the interaction across the HPS-FPGA bridge, a simple hardware accelerated adder was made for this training.
 
 \subsubsection{FPGA Side}
 Programming the FPGA to communicate with the HPS is no trivial task.
-Luckily, there exists a golden system reference design~\cite{Rocket1} for
-the board in use for this project.
-Unfortunately, support for certain versions of Quartus are missing from
-the GSRD download database, including the one used for this project, 16.0.
-While the design can be opened with a different version of the software,
-it causes a series of conflicts usually related to using IP cores that
-have changed over the iterations.
-To circumvent this issue cleanly, GSRD version 14.1 was downloaded and compiled
-on a separate install of Quartus II 14.1.
-This allowed the reference design to be studied in detail, and the sections
-required for this project to be rebuilt with Quartus Prime 16.0.
+Luckily, there exists a golden system reference design~\cite{Rocket1} for the board in use for this project.
+Unfortunately, support for certain versions of Quartus are missing from the GSRD download database, including the one used for this project, 16.0.
+While the design can be opened with a different version of the software, it causes a series of conflicts usually related to using IP cores that have changed over the iterations.
+To circumvent this issue cleanly, GSRD version 14.1 was downloaded and compiled on a separate install of Quartus II 14.1.
+This allowed the reference design to be studied in detail, and the sections required for this project to be rebuilt with Quartus Prime 16.0.
 
-From the perspective of the FPGA, The HPS exposes three bridges for
-connections~\cite{Altera6}.
+From the perspective of the FPGA, The HPS exposes three bridges for connections~\cite{Altera6}.
 As this is a relatively simple task, the lightweight bridge was used.
 Module \texttt{altera\_hps} exposes the master of this bridge as
 \texttt{h2f\_lw\_axi\_master}.
-Next, the actual hardware adder was built and integrated as a hardware
-module in Qsys with a matching interface.
+Next, the actual hardware adder was built and integrated as a hardware module in Qsys with a matching interface.
 A simple adder can produce its result after one clock cycle.
 This greatly simplifies the logic required for the Avalon slave interface.
-The logic for the control and data signals were thus written according to the
-interface specifications~\cite{Intel3}.
-Following the naming conventions for the signals allows Qsys Component Editor
-to automatically detect the Avalon slave from this module at analysis.
+The logic for the control and data signals were thus written according to the interface specifications~\cite{Intel3}.
+Following the naming conventions for the signals allows Qsys Component Editor to automatically detect the Avalon slave from this module at analysis.
 This saves the troubles of editing the \texttt{\_hw.tcl} file.
-To experiment with module configuration, the adder was designed with variable
-width.
+To experiment with module configuration, the adder was designed with variable width.
 
-The adder was then instantiated and connected to the rest of the system with
-two clicks in Qsys.
-From there, Qsys could generate the HDL for the entire system, which was then
-compiled to a bitstream file.
+The adder was then instantiated and connected to the rest of the system with two clicks in Qsys.
+From there, Qsys could generate the HDL for the entire system, which was then compiled to a bitstream file.
 With the bitstream ready, the work now shifted to the HPS.
 
 \subsection{Randomiser}
