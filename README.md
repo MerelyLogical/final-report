@@ -12,3 +12,7 @@ generate VPM file and simulate that
 latches, comb loops
 don't cares
 provide source files to james
+
+some time next week send james report
+hardware debugging -> there's an IP block for it
+
