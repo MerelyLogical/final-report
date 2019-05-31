@@ -69,6 +69,8 @@ LFSRs are a reliable way of generating pseudorandom numbers quickly with low cos
 Fulfilling the design requirements, they will thus form the starting point of data generation.
 While it is possible for data generated to be invalid as inputs to the DUT, this should not be the case for most arithmetic units.
 Even if this is the case, they can be dealt by the filter in the driver.
+On the flip side, LFSRs go through every single possible value except for one before repeating itself in a loop, so it is more efficient than a purely random data set.
+The one impossible value can be covered manually, and knowing that there is an impossible value from the randomiser can be turned into a design advantage later on when we make the driver.
 
 Following this approach, the software would only need to configure the generation at the beginning, and test data no longer needs to pass through the HPS-FPGA bridge.
 Thus, the testbench can provide fast and constant data to stress the DUT.
@@ -84,7 +86,7 @@ The higher bits are obtained by one left bitwise shift.
 
 \begin{figure}[ht]
   \centering
-  \input{tex/illu-fibonacci}
+  \input{illu/fibonacci}
   \caption{Fibonacci Configuration}
   \label{FibLFSR}
 \end{figure}
@@ -94,36 +96,48 @@ The highest bit is simply the previous lowest bit, and all other bits are obtain
 
 \begin{figure}[ht]
   \centering
-  \input{tex/illu-galois}
+  \input{illu/galois}
   \caption{Galois Configuration}
   \label{GalLFSR}
 \end{figure}
 
 Other LFSR configurations such as Xorshift~\cite{Marsaglia1} exists, but they are mostly designed and optimised as pieces of software, thus being less appropriate for this design.
 
+By examining the two configurations, we can see that Fibonacci LFSRs have to XOR multiple bits together through a cascade of 2 input XOR gates, or a single XOR gate with multiple inputs.
+On the other hand, Galois LFSRs have multiple XOR gates working independently.
+On an FPGA, the cascade of gates is usually implemented with a LUT, so while limiting LUT input to 2 might have some minor improvements, this increased delay of the Fibonacci configuration should not be obvious.
 
+As such, we need to take a step back and examine the overall structure of the randomiser to help us make this decision.
 
 \subsubsection{Randomiser Structure}
 
-\textit{Horizontal} --
-Easy to build, easy to test with.
+A horizontally structured randomiser uses all bits in the LFSR as output.
 
 \begin{figure}[ht]
   \centering
-  \input{tex/illu-horilfsr}
+  \input{illu/horilfsr}
   \caption{Horizontal Structure}
   \label{HoriLFSR}
 \end{figure}
 
-\textit{Vertical} --
-Nice randomness, more scalable, need to seed all the LFSRs differently.
+A vertically structured randomiser uses multiple LFSRs, and combines one bit from each LFSR for its output.
 
 \begin{figure}[ht]
   \centering
-  \input{tex/illu-vertlfsr}
+  \input{illu/vertlfsr}
   \caption{Vertical Structure}
   \label{VertLFSR}
 \end{figure}
+
+The horizontal option is easy to construct, but changing the width of the output value requires writing another wider LFSR since the tap positions would change.
+The vertical options is much more scalable as more or less LFSR can be instantiated depending on the required output width.
+As the widths of individual LFSRs are not related to the width of the output, a series cheap, 2-tap LFSRs can be used for it, making the earlier point of additional delay for Fibonacci LFSRs a non-issue.
+
+However, the vertical structure is not without downsides.
+Each LFSR needs a unique seed for its initialisation.
+
+
+Nice randomness, more scalable, need to seed all the LFSRs differently.
 
 \subsection{Driver}
 \subsubsection{Dual Driver System}
