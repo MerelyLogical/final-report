@@ -1,18 +1,19 @@
 \section{Hardware Design Choices}
 
-\subsection{Data Transfer Rate}
-In order to stress the DUT, the verification system must perform at a much higher frequency than the expected frequency of the DUT.
-Assuming the DUT is to run at 300MHz, to fully explore the effect of overclocking, the testbench must be able to run at double the frequency or higher.
-This gives a target frequency of 800MHz.
+\subsection{Providing Test Data}
+In order for the driver to stress the DUT, the verification system must perform at a much higher frequency than the expected frequency of the DUT.
+Assuming the DUT is to run at 300MHz, to fully explore the effect of overclocking, the testbench must be able to run at double the frequency.
+This gives an ambitious target frequency of 800MHz.
 Assuming a data width of 32-bit, the target data transfer rate is then estimated to be 25.6Gbps.
+With this rough estimate, we can start considering different design options.
 
-\subsubsection{\textbf{HPS-FPGA Bridge}}
+\subsubsection{HPS-FPGA Bridge}
 As the testing is to be controlled by the HPS, the HPS-FPGA bridge will be the immediate bottleneck if the test data is to flow from HPS to FPGA.
 While the HPS can easily generate test data with a piece of software, there is a large amount of overhead as data crosses from one architecture to another.
 This overhead exists in the form of both decreased bandwidth and increased delay.
 Thus, it is not be sensible for the HPS to send out data during runtime.
 
-\subsubsection{\textbf{Off-chip DDR SDRAM}}
+\subsubsection{Off-chip DDR SDRAM}
 Another thought may be to first populate the off-chip DDR SDRAM on the FPGA side, then feed that data to the DUT during test.
 This is already much faster than passing the data directly from HPS.
 The 1GB, 32-bit wide DDR3 on the FPGA side is rated at 400MHz.
@@ -27,7 +28,7 @@ While it could be overcome with burst and piplined accesses, it would further co
 A controller is provided by Intel~\cite{Altera3}, but it would consume a non-negligible amount of the limited FPGA resources while adding unnecessary complexities to the design.
 Customising or building a new SDRAM controller to fit this project is possible, but needlessly time-consuming.
 
-\subsubsection{\textbf{On-chip Memory}}
+\subsubsection{On-chip Memory}
 The on-chip memory is much faster and simpler to use.
 In comparison, this memory is implemented on the FPGA itself, and thus needs no external connections for accesses.
 It has higher throughput and lower latency than the SDRAM.
@@ -40,7 +41,7 @@ It is volatile like SDRAM and very limited in capacity.
 SDRAMs can have store about 1GB, while on-chip memory could only hold a few MB~\cite{Altera2}.
 Volatility is not exactly of concern in this project, but its small capacity means not much test data can be held before it needs more fed in.
 
-\subsubsection{\textbf{Distributed RAM / Registers}}
+\subsubsection{Distributed RAM / Registers}
 On-chip memory has a minimum latency of 1 clock cycle as the R/W access gets processed.
 If a even faster memory is desired, we can use LUTs or registers to store them.
 This option would eliminate the latency but takes up much more FPGA resources.
@@ -49,8 +50,9 @@ There will be a significant amount of data generated during testing, and the tes
 As such, distributed RAM will not be used in this project for data transfer.
 Registers will still be used as they are essential for many other purposes.
 
-\subsection{Randomiser}
-To exploit the benefits of on-chip memory, and circumvent the drawback of buffering testing data generated from the HPS, a method for generating testing data at runtime, on the FPGA needs to be designed.
+\subsubsection{Real Time Data Generation}
+As seen from the analysis, the best design option here should be able to exploit the benefits of on-chip memory, and circumvent the drawback of buffering testing data generated from the HPS.
+Generating testing data at runtime, on the FPGA will be such a method.
 As arithmetic operators have a vast set of valid inputs, it is necessary to have cost-effective test generation.
 
 A good choice here is to use random testing.
@@ -61,20 +63,24 @@ As the project progress, special tests could be written and run separately with 
 It should be noted that certain corner cases may represent critical paths in the design.
 To combat this, the testbench provides the option to run handwritten inputs alongside random tests.
 
-LFSRs are a reliable way of generating pseudorandom numbers quickly with low cost~\cite{Hazwani1}.
-They will thus form the starting point of data generation.
-While it is possible for data generated to be invalid as inputs to the DUT, this should not be the case for most benchmarks in this project.
-Even if this is the case, they can be dealt later in the process by the monitor.
+\subsection{LFSR Randomiser}
 
-By following this approach, the software would only need to configure the randomiser, and test data no longer needs to pass through the HPS-FPGA bridge.
+LFSRs are a reliable way of generating pseudorandom numbers quickly with low cost~\cite{Hazwani1}.
+Fulfilling the design requirements, they will thus form the starting point of data generation.
+While it is possible for data generated to be invalid as inputs to the DUT, this should not be the case for most arithmetic units.
+Even if this is the case, they can be dealt by the filter in the driver.
+
+Following this approach, the software would only need to configure the generation at the beginning, and test data no longer needs to pass through the HPS-FPGA bridge.
 Thus, the testbench can provide fast and constant data to stress the DUT.
 
 \subsubsection{LFSR Configurations}
 
+While LFSRs are simple hardware modules, there are still a few design options we should explore before implementing them.
 To compare, we can examine an 8-bit LFSR with taps on bit [7,5,4,3].
 
-\textit{Fibonacci} --
-Classical option, easier to write and scale in hardware.
+In a Fibonacci LFSR, the taps are pulled and fed into a cascade of XOR gates.
+The output of the final XOR gate is then the lowest bit of the next random number.
+The higher bits are obtained by one left bitwise shift.
 
 \begin{figure}[ht]
   \centering
@@ -83,8 +89,8 @@ Classical option, easier to write and scale in hardware.
   \label{FibLFSR}
 \end{figure}
 
-\textit{Galois} --
-Harder to write if variable length is desired, but faster in hardware.
+In a Galois LFSR, the new bits in the taps are obtained by a XOR operation between the lowest bit and the bit on the left of each tap.
+The highest bit is simply the previous lowest bit, and all other bits are obtained by one right bitwise shift.
 
 \begin{figure}[ht]
   \centering
@@ -93,8 +99,9 @@ Harder to write if variable length is desired, but faster in hardware.
   \label{GalLFSR}
 \end{figure}
 
-\textit{Others} --
-Other LFSR configurations such as Xorshift~\cite{Marsaglia1} exists, but they are much slower in hardware.
+Other LFSR configurations such as Xorshift~\cite{Marsaglia1} exists, but they are mostly designed and optimised as pieces of software, thus being less appropriate for this design.
+
+
 
 \subsubsection{Randomiser Structure}
 

@@ -8,11 +8,7 @@
 - [ ] Sub monitors designed to be identical to DUT. This way monitor module can just do the inverse multiplexer and comparisons other wrapping functions.
 - [ ] Latency of each module should be analysed, especially the consistency. If not consistent, how robust is the system?
 - [ ] Figure out what to do with new motivation
-
-generate VPM file and simulate that
-latches, comb loops
-don't cares
-provide source files to james
+- [ ] Post-synth simulation
 
 some time next week send james report
 hardware debugging -> there's an IP block for it
