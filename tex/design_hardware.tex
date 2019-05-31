@@ -4,17 +4,19 @@
 
 \subsection{Driver}
 
-
 The output of the driver is connected to two modules.
 It feeds test input to the DUT and the monitor.
 
-
-
-\subsection{Delay Tester}
-
-\subsubsection{Dual Driver System}
+\subsubsection{Filtering Input}
+% REVISIT: How am I actually going to do this?
 One driver focusses on fast stress tests, The other allows handwritten tests to coexist with random tests.
 They can be switched in software.
+
+\subsubsection{Synchronised Monitor Inputs}
+The driver has the responsibility in ensuring the monitor receives the test output from the DUT and the test inputs at the same time.
+After going through the filtering logic, the stream of test input will not only be sent to the DUT, but also sent to a shift register before reaching the monitor.
+The shift register will provide the delay required for the DUT to finish its operations.
+Since the number of cycle delay from input to output should be consistent and known by the user, the length of this delay can be configured before compiling the testbench.
 
 
 \subsection{Monitor}
