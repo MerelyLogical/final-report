@@ -1,14 +1,5 @@
 \section{A Brief Introduction to Online Arithmetic on FPGA}
 
-With the right number representation system, it is possible to perform arithmetic operations MSD first.
-Consequently, these online arithmetic operators are attractive for hardware implementation in both serial and parallel forms.
-When computing digits serially, they can be chained such that subsequent operations begin before the preceding ones complete.
-Parallel implementations tend to be most sensitive to failure in their LSDs, making them more friendly to overclocking than their LSD first counterparts, for which the opposite is true.
-
-In the past, online operators have typically been implemented in binary.
-Although Radix-2 modules are the simplest to design and has the shortest cycle time per digit, it has the highest online delay and requires the largest number of cycles to complete calculations~\cite{Tenca1}.
-As such, the choice of binary is not absolute.
-
 \subsection{Online Arithmetic}
 Traditional arithmetic operators have two common characteristics.
 Firstly, their order of operation may be different depending on the operation itself.
@@ -72,7 +63,7 @@ The radix also cannot be too high, as the time in a clock period is still limite
 The construct of FPGAs might make high-radices more attractive than it is on ICs.
 As FPGAs contain small fast carry-ripple adders, high-radix adders may be able to exploit them to obtain significant speedups~\cite{Kornerup1}.
 
-\subsection{High-radix Online Arithmetic}
+\subsection{Summary}
 Using high-radix number representations for online arithmetic is a relatively novel concept.
 While there has been some research with similar premises~\cite{Lynch1}\cite{Lynch2}, We take a more direct approach with this project by implementing custom operators made for high-radix online arithmetic on an FPGA.
 This will provide empirical results on the method, and will hopefully reveal practical insights along the way.

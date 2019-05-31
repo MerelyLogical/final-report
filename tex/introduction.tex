@@ -1,3 +1,11 @@
 \section{Introduction}
 
+With the right number representation system, it is possible to perform arithmetic operations MSD first.
+Consequently, these online arithmetic operators are attractive for hardware implementation in both serial and parallel forms.
+When computing digits serially, they can be chained such that subsequent operations begin before the preceding ones complete.
+Parallel implementations tend to be most sensitive to failure in their LSDs, making them more friendly to overclocking than their LSD first counterparts, for which the opposite is true.
+
+In the past, online operators have typically been implemented in binary.
+Although Radix-2 modules are the simplest to design and has the shortest cycle time per digit, it has the highest online delay and requires the largest number of cycles to complete calculations~\cite{Tenca1}.
+As such, the choice of binary is not absolute.
 In this project, I will explore high-radix online operators, investigating their suitability for FPGA implementation and examining the resultant tradeoffs between performance, area and power.
