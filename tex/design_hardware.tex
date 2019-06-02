@@ -22,7 +22,8 @@ Since the number of cycle delay from input to output should be consistent and kn
 \subsection{Monitor}
 
 Another concern in the system design is of the different clock domains that must exist on the FPGA.
-At a minimum, there need to be two clock domains: one surrounds the DUT and another supports the rest of the control logic around the DUT.
+Since it is not sensible to require the reference design to run as fast as the DUT, there needs to be two clock domains in the system.
+The initial idea is to have one domain surrounds the DUT and another that supports the rest of the control logic around the DUT.
 These clock frequencies can be generated with PLLs, which are provided as IP Cores in the Quartus software~\cite{Altera4}.
 A clock tree will distribute them to the individual modules.
 Data crossing clock domains will be fed through FIFOs to prevent loss.
@@ -69,9 +70,9 @@ However, this method needs the extra logic in the random controller, making the 
 \end{figure}
 
 As the test data is uniform, the monitor can be parallelised in to a number of sub-monitors.
-The sub-monitors is connected to a arbiter that is connected to three FIFOs.
+The sub-monitors is connected to a distributor that is connected to three FIFOs.
 The FIFOs are the inputs and the output of the DUT.
-A round robin arbiter distributes the data to the sub-monitors equally.
+A round robin demultiplexer distributes the data to the sub-monitors equally.
 The results from each sub-monitor are then sent to a single scoreboard.
 To avoid potential hazards, the output from the sub-monitors will be buffered before processed by the scoreboard.
 
@@ -79,8 +80,25 @@ This does not have data dependency on a random controller, and it can fully guar
 It is also scalable as more sub-monitors can be added it the DUT fills up its output buffer.
 As a downside, this method takes up the most FPGA resources to implement as it scales.
 
-Comparing across the three methods, the parallel monitors will be built first for this project, as it offers the best functionalities.
-Although unlikely, if a fatal issue arises in this design, or if the testbench needs to be more lightweight, then the lazy monitor will be used as the alternative.
+Comparing across the three methods, the parallel monitors will be used for this project, as it offers the best functionalities.
+
+\subsection{Simplified Clock Domains}
+During the implementation of the parallel monitors, it is realised that picking the parallel structure has enabled a simpler way for us to realise the hardware design regarding clock domains.
+So far, the assumption has been that during frequency testing, the testbench would hold on to a consistent frequency, while the frequency of the DUT is varied.
+However, this causes unnecessary complications as the clock ticks of the two domains would shift in and out of phase during testing, which needs to be handled with extreme care since there is heavy data moving through the domains.
+
+Looking back at the overall structure of the framework, the slowest block is the reference designs in the sub-monitors.
+The priority of a reference design is to be functionally correct.
+Since the operation it carries out can still be complex, it should have a relaxed timing requirement in order to avoid additional burdens on the designer.
+This would hopefully make the reference relatively easy to produce and difficult to make mistakes on.
+On the other hand, the rest of the testbench should be able to operate at the speed of the DUT, as they are relatively light in terms of the logical operations that they perform.
+If a slow signal path arises in the system, it is also relatively harmless to sacrifice a few cycles in terms of latency to keep its maximum frequency high.
+
+Therefore, instead of having a fast domain surrounding the DUT, the new design would have a slow domain surrounding the sub-monitor, while the rest of the testbench is clock at the same speed as the DUT.
+The number of sub-monitors is a parametrised value, but it has to be an integer.
+As such, the slow domain will always have a clock frequency that is a factor of the frequency of the rest of the testbench.
+This way, they can stay in phase, which may have made the design of the monitor slightly more complicated, but vastly simplified the rest of the system.
+
 
 \subsection{Scoreboard}
 

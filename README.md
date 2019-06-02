@@ -1,7 +1,7 @@
 # Final Report
 
-- [ ] Fibonacci vs Galois LFSRs
-- [ ] Vertical vs Horizontal LFSRs
+- [x] Fibonacci vs Galois LFSRs
+- [x] Vertical vs Horizontal LFSRs
 - [ ] LSFRs and drivers fixed on `clk_dut` vs complex driver filter on `clk_tb`
 - [ ] Sub monitors on `clk_tb` vs on a divided `clk_dut`
 - [ ] Not actually an arbiter, more like an inverse multiplexer since there is no request or grant signals
