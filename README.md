@@ -9,6 +9,8 @@
 - [ ] Latency of each module should be analysed, especially the consistency. If not consistent, how robust is the system?
 - [ ] Figure out what to do with new motivation
 - [ ] Post-synth simulation
+- [ ] On the fly reconfiguration for driver to monitor delay. have a shift register holding inputs. then once ready signal up from delay tester, start feeding that one to the monitor, also sets the ready signal for scoreboard to start counting.
+
 
 some time next week send james report
 hardware debugging -> there's an IP block for it
