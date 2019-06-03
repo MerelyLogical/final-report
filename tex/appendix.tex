@@ -1,6 +1,6 @@
-\section{A Brief Introduction to Online Arithmetic on FPGA}
+\chapter{A Brief Introduction to Online Arithmetic on FPGA}
 
-\subsection{Online Arithmetic}
+\section{Online Arithmetic}
 Traditional arithmetic operators have two common characteristics.
 Firstly, their order of operation may be different depending on the operation itself.
 A traditional adder, parallel or serial, generates its answers from the LSD to the MSD.
@@ -46,7 +46,7 @@ With overclocking, online arithmetic operators fail gracefully, losing their pre
 Thus, it allows for a runtime tradeoff between precision and frequency~\cite{Shi2}.
 
 % REVISIT JD: find better arguments for high radix on FPGA for these two paras
-\subsection{High-radix Arithmetic}
+\section{High-radix Arithmetic}
 Conventional designs of arithmetic operators use binary representations.
 The additional concerns of high-radix operators did not provide justifiable improvements as clock speed of processors kept increasing.
 In recent years, the clock speed increase effectively ended, and semiconductor dies shrunk to extremely small sizes.
@@ -63,7 +63,7 @@ The radix also cannot be too high, as the time in a clock period is still limite
 The construct of FPGAs might make high-radices more attractive than it is on ICs.
 As FPGAs contain small fast carry-ripple adders, high-radix adders may be able to exploit them to obtain significant speedups~\cite{Kornerup1}.
 
-\subsection{Summary}
+\section{Summary}
 Using high-radix number representations for online arithmetic is a relatively novel concept.
 While there has been some research with similar premises~\cite{Lynch1}\cite{Lynch2}, We take a more direct approach with this project by implementing custom operators made for high-radix online arithmetic on an FPGA.
 This will provide empirical results on the method, and will hopefully reveal practical insights along the way.

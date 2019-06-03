@@ -1,6 +1,6 @@
-\section{System-level Design}
+\chapter{System-level Design}
 
-\subsection{Testbench Architecture}
+\section{Testbench Architecture}
 The design of the verification system is the major engineering challenge of this project.
 % REVISIT: this sentence should be moved to intro for overall motivation of project.
 While there have been many similar performance analyses done on hybrid SoCs before, each of them used their own, usually ad hoc, testbench design~\cite{Shi1}~\cite{Li1}.
@@ -29,13 +29,13 @@ The scoreboard collects the results from the monitor and writes them to memory l
 These memory locations are read by the test scripts, providing results and other useful information to the user.
 The design and implementation of each individual hardware and software module will be elaborated in detail in the following chapters.
 
-\subsection{User Interface}
+\section{User Interface}
 
 For this evaluation framework to be meaningful, it has to attract users by being easy to configure and run.
 To achieve this, in addition to the functional designs, both hardware and software need to be designed with the user's experience in mind.
 % REVISIT: easy change of parameter in qsys, configuration file interface, maybe someof this is more like implementation
 
-\subsection{Hardware Choice}
+\section{Hardware Choice}
 The system itself will be built on a Cyclone V SX SoC Development Board from Intel~\cite{Intel1}.
 
 \begin{figure}[H]
@@ -65,7 +65,7 @@ As there are very few significant functional differences between the two brands,
 Due to the architectural differences between the logic elements between Xilinx and Altera FPGAs~\cite{Scekic1}, the performances on the two boards are not necessarily identical.
 Once the project has progressed to a point where the system design is mature and tested, the Xilinx alternative can be explored as an extension.
 
-\subsection{Software Choice}
+\section{Software Choice}
 The software choice follows closely with the hardware choice in this project.
 To develop for Intel FPGAs, Quartus has to be used.
 The version picked is arbitrary as there are not many functional differences between the versions that will be critical to the project.

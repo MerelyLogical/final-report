@@ -1,6 +1,6 @@
-\section{Hardware Implementation}
+\chapter{Hardware Implementation}
 
-\subsection{Project Hierarchy}
+\section{Project Hierarchy}
 
 \begin{figure}[H]
   \centering
@@ -13,7 +13,7 @@ Before any engineering work was done towards the final product, a small module w
 This module needed to be simple yet covered enough grounds to provide as much learning during the process as possible without taking up too much actual development time towards the product.
 As the greatest unfamiliarity was with the interaction across the HPS-FPGA bridge, a simple hardware accelerated adder was made for this training.
 
-\subsubsection{FPGA Side}
+\subsection{FPGA Side}
 Programming the FPGA to communicate with the HPS is no trivial task.
 Luckily, there exists a golden system reference design~\cite{Rocket1} for the board in use for this project.
 Unfortunately, support for certain versions of Quartus are missing from the GSRD download database, including the one used for this project, 16.0.
@@ -37,11 +37,11 @@ The adder was then instantiated and connected to the rest of the system with two
 From there, Qsys could generate the HDL for the entire system, which was then compiled to a bitstream file.
 With the bitstream ready, the work now shifted to the HPS.
 
-\subsection{Randomiser}
+\section{Randomiser}
 
-\subsection{Driver}
+\section{Driver}
 
-\subsubsection{Delay Tester}
+\subsection{Delay Tester}
 
 I built a delay tester to find out the delay of the DUT.
 With a 3-bit counter as shown in the timing diagram, it can measure this delay for up to 8 clock cycles.
@@ -54,10 +54,10 @@ With a 3-bit counter as shown in the timing diagram, it can measure this delay f
 \end{figure}
 Testing with 0 is safe since LFSR will never output 0.
 
-\subsubsection{Switching system}
+\subsection{Switching system}
 
-\subsection{Monitor}
-\subsubsection{Sub Monitors}
+\section{Monitor}
+\subsection{Sub Monitors}
 
 \begin{figure}[ht]
   \centering
@@ -89,4 +89,4 @@ Testing with 0 is safe since LFSR will never output 0.
   \label{DisMon}
 \end{figure}
 
-\subsection{Scoreboard}
+\section{Scoreboard}

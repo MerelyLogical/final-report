@@ -1,4 +1,4 @@
-\documentclass[12pt]{article}
+\documentclass[12pt]{report}
 \usepackage[margin=2cm]{geometry}
 \usepackage{cite}
 \usepackage{float}
@@ -36,27 +36,28 @@
 \usepackage{setspace}
 
 \begin{document}
-%\setstretch{1.0}
+\begingroup
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{0em}
 \input{tex/titlepage}
 
-\newpage
-\vspace*{6cm}
+\endgroup
+
+\begingroup
+
+\setstretch{1.3}
 \input{tex/acknowledgement}
 
-\newpage
-\vspace*{6cm}
 \input{tex/abstract}
 
-\newpage
-
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{1}
 \tableofcontents
-
 \newpage
-%\setstretch{1.5}
 
 \input{tex/introduction}
 
+\newpage
 \input{tex/research}
 
 \newpage
@@ -70,7 +71,6 @@
 \input{tex/design_software}
 
 \newpage
-
 \input{tex/implementation_hardware}
 
 \input{tex/implementation_software}
@@ -80,21 +80,23 @@
 \newpage
 \input{tex/testing}
 
-\section{Results}
+\chapter{Results}
 % REVISIT: What to put here?
 
 \input{tex/evaluation}
 
-\section{Conclusion}
+\newpage
+\chapter{Conclusion}
 
-\section{Further Work}
+\chapter{Further Work}
 
-\section{User Guide}
+\chapter{User Guide}
 
 \newpage
-%\setstretch{1.0}
 \appendix
 \input{tex/appendix}
+
+\endgroup
 
 \newpage
 \input{tex/bibliography}
