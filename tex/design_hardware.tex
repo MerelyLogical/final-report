@@ -1,19 +1,202 @@
 \section{Hardware Design Choices}
 
-\input{tex/design_randomiser}
+\subsection{Providing Test Data}
+In order for the driver to stress the DUT, the verification system must perform at a much higher frequency than the expected frequency of the DUT.
+Assuming the DUT is to run at 300MHz, to fully explore the effect of overclocking, the testbench must be able to run at double the frequency.
+This gives an ambitious target frequency of 800MHz.
+Assuming a data width of 32-bit, the target data transfer rate is then estimated to be 25.6Gbps.
+With this rough estimate, we can start considering different design options.
+
+\subsubsection{HPS-FPGA Bridge}
+As the testing is to be controlled by the HPS, the HPS-FPGA bridge will be the immediate bottleneck if the test data is to flow from HPS to FPGA.
+While the HPS can easily generate test data with a piece of software, there is a large amount of overhead as data crosses from one architecture to another.
+This overhead exists in the form of both decreased bandwidth and increased delay.
+Thus, it is not be sensible for the HPS to send out data during runtime.
+
+\subsubsection{Off-chip DDR SDRAM}
+Another thought may be to first populate the off-chip DDR SDRAM on the FPGA side, then feed that data to the DUT during test.
+This is already much faster than passing the data directly from HPS.
+The 1GB, 32-bit wide DDR3 on the FPGA side is rated at 400MHz.
+With double rate transfer, this gives a maximum transfer rate of 25.6Gbps.
+
+Although using the off-chip RAM may theoretically achieve the targets, it still has its disadvantages.
+Firstly, the process of filling up the memory takes time.
+Thus, the testing would be broken up into bursts, with time in between for checking results and filling in new data.
+The complexity of the SDRAM interface also requires an SDRAM controller to be used to manage SDRAM refresh cycles, address multiplexing and interface timing.
+These all add up to significant access latency.
+While it could be overcome with burst and piplined accesses, it would further complicate the SDRAM controller.
+A controller is provided by Intel~\cite{Altera3}, but it would consume a non-negligible amount of the limited FPGA resources while adding unnecessary complexities to the design.
+Customising or building a new SDRAM controller to fit this project is possible, but needlessly time-consuming.
+
+\subsubsection{On-chip Memory}
+The on-chip memory is much faster and simpler to use.
+In comparison, this memory is implemented on the FPGA itself, and thus needs no external connections for accesses.
+It has higher throughput and lower latency than the SDRAM.
+The memory transactions can also be piplined, giving one transaction per clock cycle.
+With an on-chip FIFO accessed in dual-port mode, the write operations at one end and the read operations at the other end can happen simultaneously.
+This feature is useful as tests are prepared and fed into the DUT, or when test results are collected and fed to the monitor.
+
+On-chip memory is not without its drawbacks.
+It is volatile like SDRAM and very limited in capacity.
+SDRAMs can have store about 1GB, while on-chip memory could only hold a few MB~\cite{Altera2}.
+Volatility is not exactly of concern in this project, but its small capacity means not much test data can be held before it needs more fed in.
+
+\subsubsection{Distributed RAM / Registers}
+On-chip memory has a minimum latency of 1 clock cycle as the R/W access gets processed.
+If a even faster memory is desired, we can use LUTs or registers to store them.
+This option would eliminate the latency but takes up much more FPGA resources.
+The capacity is even more limited as LUTs are usually used for logic.
+There will be a significant amount of data generated during testing, and the testbench should be as lightweight as possible to allow flexibility in the DUTs.
+As such, distributed RAM will not be used in this project for data transfer.
+Registers will still be used as they are essential for many other purposes.
+
+\subsubsection{Real Time Data Generation}
+As seen from the analysis, the best design option here should be able to exploit the benefits of on-chip memory, and circumvent the drawback of buffering testing data generated from the HPS.
+Generating testing data at runtime, on the FPGA will be such a method.
+As arithmetic operators have a vast set of valid inputs, it is necessary to have cost-effective test generation.
+
+A good choice here is to use random testing.
+With relatively low effort, random testing can provide significant coverage and discover relatively subtle errors~\cite{Duran1}.
+The main drawback of random testing is the possible lack of coverage for corner cases, for which the usual solution is to provide handwritten tests to complement it.
+However, as the main goal of this testbench is gauging the performance of the module, and not necessarily verifying the correctness of the module, having uncovered testing holes is acceptable during stress testing.
+As the project progress, special tests could be written and run separately with a relaxed timing restriction to cover the holes.
+It should be noted that certain corner cases may represent critical paths in the design.
+To combat this, the testbench provides the option to run handwritten inputs alongside random tests.
+
+\subsection{Randomiser}
+
+LFSRs are a reliable way of generating pseudorandom numbers quickly with low cost~\cite{Hazwani1}.
+Fulfilling the design requirements, they will thus form the starting point of data generation.
+While it is possible for data generated to be invalid as inputs to the DUT, this should not be the case for most arithmetic units.
+Even if this is the case, they can be dealt by the filter in the driver.
+On the flip side, LFSRs go through every single possible value except for one before repeating itself in a loop, so it is more efficient than a purely random data set.
+The one impossible value can be covered manually, and knowing that there is an impossible value from the randomiser can be turned into a design advantage later on when we make the driver.
+
+Following this approach, the software would only need to configure the generation at the beginning, and test data no longer needs to pass through the HPS-FPGA bridge.
+Thus, the testbench can provide fast and constant data to stress the DUT.
+
+\subsubsection{LFSR Configurations}
+
+While LFSRs are simple hardware modules, there are still a few design options we should explore before implementing them.
+To compare, we can examine an 8-bit LFSR with taps on bit [7,5,4,3].
+
+In a Fibonacci LFSR, the taps are pulled and fed into a cascade of XOR gates.
+The output of the final XOR gate is then the lowest bit of the next random number.
+The higher bits are obtained by one left bitwise shift.
+
+\begin{figure}[ht]
+  \centering
+  \input{illu/fibonacci}
+  \caption{Fibonacci Configuration}
+  \label{FibLFSR}
+\end{figure}
+
+In a Galois LFSR, the new bits in the taps are obtained by a XOR operation between the lowest bit and the bit on the left of each tap.
+The highest bit is simply the previous lowest bit, and all other bits are obtained by one right bitwise shift.
+
+\begin{figure}[ht]
+  \centering
+  \input{illu/galois}
+  \caption{Galois Configuration}
+  \label{GalLFSR}
+\end{figure}
+
+Other LFSR configurations such as Xorshift~\cite{Marsaglia1} exists, but they are mostly designed and optimised as pieces of software, thus being less appropriate for this design.
+
+By examining the two configurations, we can see that Fibonacci LFSRs have to XOR multiple bits together through a cascade of 2 input XOR gates, or a single XOR gate with multiple inputs.
+On the other hand, Galois LFSRs have multiple XOR gates working independently.
+On an FPGA, the cascade of gates is usually implemented with a LUT, so while limiting LUT input to 2 might have some minor improvements, this increased delay of the Fibonacci configuration should not be obvious.
+
+In terms of implementation, Fibonnaci LFSRs are slightly easier to code if width configurability is desired.
+However, building a configurable Galois LFSR is only slightly more complex.
+
+As such, we need to take a step back and examine the overall structure of the randomiser to help us make this decision.
+
+\subsubsection{Randomiser Structure}
+
+A horizontally structured randomiser uses all bits in the LFSR as output.
+
+\begin{figure}[ht]
+  \centering
+  \input{illu/horilfsr}
+  \caption{Horizontal Structure}
+  \label{HoriLFSR}
+\end{figure}
+
+A vertically structured randomiser uses multiple LFSRs, and combines one bit from each LFSR for its output.
+
+\begin{figure}[ht]
+  \centering
+  \input{illu/vertlfsr}
+  \caption{Vertical Structure}
+  \label{VertLFSR}
+\end{figure}
+
+The horizontal option is easy to construct, but changing the width of the output value requires writing another wider LFSR since the tap positions would change.
+The vertical options is much more scalable as more or less LFSR can be instantiated depending on the required output width.
+As the widths of individual LFSRs are not related to the width of the output, a series cheap, 2-tap LFSRs can be used for it, making the earlier point of additional delay for Fibonacci LFSRs a non-issue.
+
+However, the vertical structure is not without downsides.
+Each LFSR needs a unique seed for its initialisation, making increasing the width not completely automatic unless we also build something that generates these seeds.
+More importantly, the structure reduces the test efficiency introduced by LFSRs.
+A single LFSR will go through every non-zero value before repeating itself, the vertically arranged randomiser will have early repeats.
+
+If we allow early repeats, then the horizontal structure can be easily scaled.
+This is achieved by building a long LFSR and taking a trucated version of the output value when fewer bits are required for the tests.
+
+As such, there is no real advantage of using the vertical structure.
+With truncation providing the configurability in the horizontal structure, the slight advantage of the Fibonacci LFSRs in its ease to write is nullified.
+Having the slight advantage in terms of speed for Galois LFSRs, they will be chosen as the randomiser design in this project.
 
 \subsection{Driver}
 
-The output of the driver is connected to two modules.
-It feeds test input to the DUT and the monitor.
+The driver should have two main types operation when feeding data into the DUT.
+One is the stress testing mode, where the driver tries to pushes a new piece of data into the DUT at every clock tick.
+The alternative is a slow manual mode, where the driver reads from the HPS-FPGA bridge and changes its output to the DUT whenever a new test point is specified by the software.
+The stress testing mode will expose the DUT to as much random test points as possible in the test duration.
+The manual mode is used when the user has a special interest in a limited list of inputs.
 
-\subsubsection{Filtering Input}
-% REVISIT: How am I actually going to do this?
-One driver focusses on fast stress tests, The other allows handwritten tests to coexist with random tests.
-They can be switched in software.
+\subsubsection{Stress Testing Mode}
+The vanilla way of providing data to the DUT is to for the driver to simply instantiate the same number of randomisers as the number of inputs of the DUT.
+Then the randomisers' outputs can be directly connected to the inputs of the DUT.
+
+While this fast and cheap method fulfils most of the requirements of the testbench, it suffers from a few issues.
+One, there is no user control for the test data.
+If we consider the LFSR pseudo-random number sequence to be unpredictable, then the only thing the user can do will be forcing the LFSRs to initialise with same of different seeds and therefore the DUT will receive identical or different inputs.
+However, this level of customisation mostly meaningless.
+
+\subsubsection{Input Filtering}
+To introduce some level of non-trivial user control in the test data without losing speed, a filtering system is included in the driver design.
+The filtering system needs to be fast since this is still a stress test, yet it should provide as much utility as possible to the users.
+
+A possible design here is to allow the user to specify a maximum and a minimum bound to the value of the input data.
+Each output from the randomiser is compared to these values and either sent forward if they passed or replaced if they failed the comparisons.
+If a higher level of control is desired, there can also be a list of invalid inputs within the bounds of validity.
+However, the latency can get high if the list is long and the comparisons can get slow if the high or low bound is irregular in its binary form.
+The replacement system can also get complex if the bounds are strict.
+
+A better alternative to achieve this is a bit manipulation system.
+The user can force individual bits in the data to be cleared or set.
+This is less flexible than the first design, but with some tricks the user is still able to perform a great level of input control.
+Having only odd or even test inputs will be trivial under this system.
+To set maximums or minimums for the test data, the user can simply set or clear the higher bits.
+Certainly this imposes a strong preference to arithmetic units with regular binary representations, but most interesting designs for high-radix arithmetic units, including the ones that spawned this project, use a radix that is a power of 2.
+As such, the binary manipulation system will always be helpful for the user to filter out uninteresting test points or to focus in on more meaningful ones.
+
+\subsubsection{Manual Input Mode}
+
+As discussed in the randomiser section, random testing is surprisingly useful, but they do have their limits.
+If the user has a list of inputs that will trigger key logic paths in their design, they should be able to investigate them under this framework.
+This would serve as a good compliment to the random testing.
+The manual input mode is designed for this scenario.
+In this mode, the user first provides a list of numbers when configuring the test in software, and enable the manual input mode.
+Then, the test software will read through this list and write them to a set of memory locations on the HPS-FPGA bridge.
+A simple transfer protocol will be used for the driver to read these locations and then forward them to the DUT.
+Due to the limitations of the bridge, the DUT cannot be fully saturated with these data.
+As such, each manual test input will be repeatedly sent to the DUT before the next one becomes available.
 
 \subsubsection{Synchronised Monitor Inputs}
-The driver has the responsibility in ensuring the monitor receives the test output from the DUT and the test inputs at the same time.
+In addition to controlling what gets sent to the DUT, the driver has the responsibility to ensure that the monitor receives the test output from the DUT and the test inputs from the driver at the same time.
 After going through the filtering logic, the stream of test input will not only be sent to the DUT, but also sent to a shift register before reaching the monitor.
 The shift register will provide the delay required for the DUT to finish its operations.
 Since the number of cycle delay from input to output should be consistent and known by the user, the length of this delay can be configured before compiling the testbench.
@@ -99,10 +282,16 @@ The number of sub-monitors is a parametrised value, but it has to be an integer.
 As such, the slow domain will always have a clock frequency that is a factor of the frequency of the rest of the testbench.
 This way, they can stay in phase, which may have made the design of the monitor slightly more complicated, but vastly simplified the rest of the system.
 
-
 \subsection{Scoreboard}
+One of the simplification has to do with the connection from the monitor to the scoreboard.
+Previously, there was no guarantee that the scoreboard would be synchronous with the sub-monitors producing the results of the tests.
+This necessitated the event driven system, which would reduce the amount of traffic produced by the sub-monitors, and allows the scoreboard to keep track of more test data points that it normally could.
+Now that the scoreboard runs on the fast clock, the monitor can simply produce one piece of information for each data point, and the scoreboard would be able to handle it.
 
-If the monitor detects an interesting event such as an error, it will send a message to the scoreboard.
-The scoreboard has counters tracking these events, which are exposed and can be read by the HPS.
+Since the precision of results coming from the DUT is of interest to us, one possible use of this bandwidth is to pass on the precision of each test data to the scoreboard.
+The scoreboard can then produce more detailed statistics from the test set.
+Instead of only counting how many points are correct and how many are wrong, it will also be able to determine more interesting values such as the maximum and minimum precision of a test set.
 
-The software can run statistics to provide further insights to the user.
+These output values will be stored in registers which are exposed and can be read by the HPS.
+
+If further statistics and insights are desired, it would be more sensible to perform these operations in the testing software.

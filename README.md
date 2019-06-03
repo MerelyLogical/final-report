@@ -17,3 +17,5 @@ hardware debugging -> there's an IP block for it
 
 debugging -> cyclic behaviour in design
 but none matches that of the error rate
+
+design described in chronological order, but implementation is in logical order?
