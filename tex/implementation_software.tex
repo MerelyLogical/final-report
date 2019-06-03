@@ -17,3 +17,9 @@ The results were compared and confirmed that this training module worked.
 While called hardware acceleration, the FPGA actually had worse performance than the HPS in this testing case.
 The CPU is reasonably efficient in calculating additions, while calculating on the FPGA requires the adder I/O data going through the HPS-FPGA bridge.
 This incurs a significant overhead, thus slowing it down.
+
+\subsubsection{newstuff}
+Most interactions through the HPS-FPGA bridge involves writing and reading different memory locations.
+
+the software is mainly a collection of functions, each performs a series of reads and writes.
+This means the final test procedure would be easier to 

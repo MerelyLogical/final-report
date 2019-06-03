@@ -1,0 +1,38 @@
+\begin{forest}
+  for tree={
+    align=center,
+    font=\ttfamily,
+    edge+={thick, -{Stealth[]}},
+    l sep'+=10pt,
+    fork sep'=10pt,
+  },
+  forked edges,
+  if level=0{
+    inner xsep=0pt,
+    tikz={\draw [thick] (.children first) -- (.children last);}
+  }{},
+  [sys\_top
+    [hps\_reset]
+    [debounce]
+    [soc\_system
+      [hps]
+      [pll]
+      [pll\_reconfig]
+      [test\_wrapper
+        [testbench
+          [randomiser]
+          [driver]
+          [monitor
+            [sub\_mon]
+          ]
+          [scoreboard]
+        ]
+      ]
+      [dut]
+      [ref]
+      [...]
+    ]
+    [altera\_edge\_detector]
+    [...]
+  ]
+\end{forest}
