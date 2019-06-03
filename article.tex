@@ -32,9 +32,15 @@
 \usepackage{pgfgantt}
 \usepackage{indentfirst}
 \usepackage{array}
+\usepackage{setspace}
 
 \begin{document}
+%\setstretch{1.0}
 \input{tex/titlepage}
+
+\newpage
+\vspace*{6cm}
+\input{tex/acknowledgement}
 
 \newpage
 \vspace*{6cm}
@@ -46,25 +52,30 @@
 \tableofcontents
 
 \newpage
+%\setstretch{1.5}
 
 \input{tex/introduction}
 
 \input{tex/research}
 
+\newpage
 \input{tex/specification}
 
+\newpage
 \input{tex/design_system}
 
 \input{tex/design_hardware}
 
 \input{tex/design_software}
 
+\newpage
 \input{tex/implementation_hardware}
 
 \input{tex/implementation_software}
 
 \input{tex/implementation_system}
 
+\newpage
 \section{Testing}
 
 \section{Results}
@@ -78,6 +89,7 @@
 \section{User Guide}
 
 \newpage
+%\setstretch{1.0}
 \appendix
 \input{tex/appendix}
 
