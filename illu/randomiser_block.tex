@@ -2,20 +2,21 @@
   [
     x=1em, y=1em,
     block/.style =
-      {draw, rectangle, align=center, minimum width=4em, minimum height=6em},
-    iarrow/.style =
-      {<-, >={Stealth}, font=\ttfamily},
-    oarrow/.style =
-      {->, >={Stealth}, font=\ttfamily}
+      {draw, rectangle, align=center, minimum width=4em, minimum height=5em},
+    sarrow/.style =
+      {>={Stealth}, font=\ttfamily},
+    darrow/.style =
+      {double distance=1.5pt, >={Stealth}, font=\ttfamily}
   ]
 
 \node[block, label=above:Randomiser] (r) at (0,0) {};
 
-\draw [iarrow] ($(r.west)+(0,2)$) -- ++(left:3) node[left] {clk};
-\draw [iarrow] ($(r.west)+(0,1)$) -- ++(left:3) node[left] {reset};
-\draw [iarrow] ($(r.west)-(0,1)$) -- ++(left:3) node[left] {enable};
-\draw [iarrow] ($(r.west)-(0,2)$) -- ++(left:3) node[left] {initial};
+\draw [<-, sarrow] ($(r.west)+(0,2)$) -- ++(left:3) node[left] {clk};
+\draw [<-, sarrow] ($(r.west)+(0,1)$) -- ++(left:3) node[left] {reset};
 
-\draw [oarrow] ($(r.east)+(0,2)$) -- ++(right:3) node[right] {out};
+\draw [<-, sarrow] ($(r.west)-(0,1)$) -- ++(left:3) node[left] {enable};
+\draw [<-, sarrow] ($(r.west)-(0,2)$) -- ++(left:3) node[left] {initial};
+
+\draw [->, darrow] ($(r.east)-(0,2)$) -- ++(right:3) node[right] {out};
 
 \end{tikzpicture}

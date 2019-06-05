@@ -84,7 +84,7 @@ In a Fibonacci LFSR, the taps are pulled and fed into a cascade of XOR gates.
 The output of the final XOR gate is then the lowest bit of the next random number.
 The higher bits are obtained by one left bitwise shift.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \input{illu/fibonacci}
   \caption{Fibonacci Configuration}
@@ -94,7 +94,7 @@ The higher bits are obtained by one left bitwise shift.
 In a Galois LFSR, the new bits in the taps are obtained by a XOR operation between the lowest bit and the bit on the left of each tap.
 The highest bit is simply the previous lowest bit, and all other bits are obtained by one right bitwise shift.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \input{illu/galois}
   \caption{Galois Configuration}
@@ -116,7 +116,7 @@ As such, we need to take a step back and examine the overall structure of the ra
 
 A horizontally structured randomiser uses all bits in the LFSR as output.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \input{illu/horilfsr}
   \caption{Horizontal Structure}
@@ -125,7 +125,7 @@ A horizontally structured randomiser uses all bits in the LFSR as output.
 
 A vertically structured randomiser uses multiple LFSRs, and combines one bit from each LFSR for its output.
 
-\begin{figure}[ht]
+\begin{figure}[H]
   \centering
   \input{illu/vertlfsr}
   \caption{Vertical Structure}
