@@ -60,7 +60,14 @@ Implementing the randomiser is straight forward.
 A possible set of taps for a 32-bit Galois LFSR is [32, 30, 26, 25].
 The logic is then to XOR the bits left of the taps with bit 0, and simple right shift for all other bits.
 For driver to control the randomiser, an enable signal and an initial signal is added as input in addition to clock and reset.
-The initial signal is what seeds the LFSR.
+The initial signal seeds the LFSR.
+
+\begin{figure}[ht]
+  \centering
+  \input{illu/randomiser_block}
+  \caption{Randomiser Block Diagram}
+  \label{RandomiserBlk}
+\end{figure}
 
 \section{Driver}
 
