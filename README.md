@@ -21,3 +21,6 @@ but none matches that of the error rate
 design described in chronological order, but implementation is in logical order
 
 What to do with stuff not actually implemented at report submission but already designed and can be easily implemented before demo?
+
+Use of colors in the report
+
