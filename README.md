@@ -24,3 +24,4 @@ What to do with stuff not actually implemented at report submission but already 
 
 Use of colors in the report
 
+afterburner FPGA card in Mac pro?
