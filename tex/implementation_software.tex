@@ -1,6 +1,7 @@
 \chapter{Software Implementation}
 
 \subsection{HPS Side}
+\textcolor{red}{Need to take out this section and only keep the useful stuff}
 The HPS runs Ubuntu and a Bash script has been written to load the bitstream onto the FPGA.
 Next, a program was written in Python to test the hardware design from the HPS.
 The interfaces are mapped onto the physical memory, thus they can be accessed by opening \texttt{/dev/mem}.
@@ -18,8 +19,5 @@ While called hardware acceleration, the FPGA actually had worse performance than
 The CPU is reasonably efficient in calculating additions, while calculating on the FPGA requires the adder I/O data going through the HPS-FPGA bridge.
 This incurs a significant overhead, thus slowing it down.
 
-\subsection{newstuff}
+\subsection{New Stuff Here}
 Most interactions through the HPS-FPGA bridge involves writing and reading different memory locations.
-
-the software is mainly a collection of functions, each performs a series of reads and writes.
-This means the final test procedure would be easier to 
