@@ -1,5 +1,34 @@
 \chapter{User Guide Provided to Test Volunteers}
 
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|>{\ttfamily}p{11em}|p{\dimexpr\textwidth-18em}|}
+    \hline
+    \textrm{Command}   & Explanation \\
+    \hline
+    reset              & Resets the system and test results. \\
+    version            & Prints the system version. \\
+    freq <speed>       & Sets the clock speed to the specified value in MHz. Prints the actual frequency configured. \\
+    mode <m|a>         & Choose between \underline{m}anual and \underline{a}uto test mode. \\
+    manual <a|b> <hex>  & Give input in manual mode. \\
+    bitset <a|b> <hex>  & Force bits to be 1 in auto mode. \\
+    bitclr <a|b> <hex>  & Force bits to be 0 in auto mode. \\
+    run <time>         & Runs the test for specified duration in ms. Prints the results at the end of the test. \\
+    \hline
+  \end{tabular}
+  \caption{Commands accepted in test REPL}
+\end{table}
+
+Notes:
+\begin{itemize}
+  \item Arguments in angle brackets are required. Arguments in square brackets are optional.
+  \item Frequency configuration is done by a PLL which has limited granularities. As such the actual frequency may differ from the desired frequency.
+  \item Argument \texttt{<a|b>} is used to select which input this command will apply to.
+  \item \texttt{<hex>} needs to be in the format \texttt{[0-9a-fA-F]\{1,8\}}. In words, it takes 1 to 8 digits of case-insensitive hexadecimal digits. No other characters including space or underscore is allowed, base prefixes such as \texttt{0x} are unnecessary and disallowed.
+  \item Under the current hardware environment, a safe range for \texttt{<speed>} in MHz is from 50 to 400.
+\end{itemize}
+
+
 \chapter{Raw Data}
 
 \textcolor{red}{+Code Snippets?}
