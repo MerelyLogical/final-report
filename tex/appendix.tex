@@ -1,4 +1,107 @@
-\chapter{User Guide Provided to Test Volunteers}
+\chapter{User Guide}
+
+\section{Introduction}
+
+This project provides an extensible framework for at-speed evaluation of arithmetic hardware.
+
+It is currently only implemented and tested with the following environment:
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|l|l|}
+    \hline
+    Item          & Version \\
+    \hline
+    Hardware      & Cyclone V SX SoC development board \\
+    HPS System    & Ubuntu 16.04.6 LTS (GNU/Linux 3.10.31 armv7l)\\
+    HPS Python    & 2.7.12 \\
+    Quartus Prime & 16.0.0.211 \\
+    \hline
+  \end{tabular}
+  \caption{Tested Environment}
+\end{table}
+
+To download this implementation, use
+
+\texttt{git clone https://github.com/MerelyLogical/arithmetic-testbench.git}
+
+It includes both hardware and software files.
+
+\section{Configuring Hardware}
+The hardware needs to be configured to fit the design before compiled and uploaded onto the development board.
+This guide provides the steps to this configuration with Quartus' GUI in a beginner-friendly way.
+It should be noted that this configuration can also be done by editing the \texttt{.qsys} file directly.
+The summary of this section is to first integrate the user's design into the Qsys system as a component.
+Then the system is compiled into synthesisable HDL.
+The whole system is then synthesised fitted, and then assembled into an \texttt{.sof} file.
+In order to upload this to the FPGA through the HPS later, it is converted to an \texttt{.rbf}, but this is optional if a different method of programming the FPGA is desired.
+
+\begin{enumerate}
+  \item Open Quartus 16.0
+  \item File $\rightarrow$ Open Project... $\rightarrow$ \texttt{cy5-systest.qpf}.
+  \item Tools $\rightarrow$ Qsys
+  \item File $\rightarrow$ Open... $\rightarrow$ \texttt{soc\_system.qsys}.
+        (The open dialogue may pop-up automatically on start up of Qsys.)
+  \item In the IP Catalog window, click New..., which will bring out the component editor.
+        This turns your designed components into Qsys components, which will then be integrated into the Qsys system.
+  \item Enter basic information of your design in the \textit{Component} tab of the component editor.
+  \item In the \textit{Files} tab, add your design files, select the top-level module and click on \textit{Analyze Synthesis Files}.
+  \item Module parameters and be set in the \textit{Parameters} tab.
+  \item The \textit{Signals \& Interfaces} tab should have detected all ports of your design.
+        First ensure that the clock and the reset inputs are detected and categorised in the interface list correctly.
+        Then to allow connection to the rest of the testbench, move the two inputs and the one output of your design into a \textit{Conduit} interface.
+        Associate the clock and the reset signal to the conduit.
+        Then name the two inputs a and b, and name the output as out.
+  \item Finish... $\rightarrow$ Yes, Save $\rightarrow$ Yes, save before refresh.
+  \item The created component should now show up in the \textit{IP Catalog}.
+  \item Add the component to the system, enter the desired parameter values before clicking on \textit{Finish}.
+  \item Connect the signals of your design using the \textit{System Contents} window of Qsys.
+        The clock should be connnected to the \texttt{outclk0} signal of the component \texttt{pll\_dut}.
+        The reset signal should be connected to the \texttt{clk\_reset} signal of the component \texttt{clk\_ref\_50M}.
+        The conduit should be connected to the opposing conduit in the \texttt{test\_wrapper} module.
+  \item Click on the \texttt{test\_wrapper} module and configure its parameters where necessary.
+        \texttt{NUM\_SUB\_MON} determines how many sub-monitors are spawned to run in parallel.
+        \texttt{WIDTH} should match the width of your design's I/O width.
+  \item Fix any outstanding errors in the \texttt{Messages} window if preset.
+  \item Click on Generate HDL...
+  \item Ensure \textit{Create HDL design files for synthesis} is not on none.
+  \item Generate the HDL files.
+  \item Click on Finish to close Qsys.
+  \item Quartus should prompt you to add the \texttt{.qip} file and the \texttt{.sip} file.
+        Follow them by going to Project $\rightarrow$ Add/Remove Files to Project...
+  \item After making sure that the two Qsys files are included, start the compilation by going to Processing $\rightarrow$ Start Compilation.
+  \item By the end of the compilation, the assembler should have produced \texttt{output\_files/cy5-systest.sof}.
+        We need this in a different format, so go to File $\rightarrow$ Convert Programming Files...
+  \item Select \texttt{.rbf} as the output type.
+  \item Click on the only entry in the input files table, and click on Add File... to add the produced \texttt{.sof} file.
+  \item The hardware setup is completed after obtaining the \texttt{.rbf} file.
+\end{enumerate}
+
+\section{Setting up the Board}
+By the end of this sections, we should have the FPGA programmed and the software uploaded to the HPS, ready to start running the tests.
+In this guide we will be using rsync to upload the \texttt{/scripts} folder and the \texttt{.rbf} file into the board, and programming the FPGA from the HPS, but other methods are equally as valid.
+
+\begin{enumerate}
+  \item Copy the \texttt{.rbf} file into \texttt{/scripts} and upload it with \texttt{rsync}.
+
+  \texttt{rsync -rtuv ./ root@ee-cy5soc3.ee.ic.ac.uk:/home/\line(1,0){30}/scripts}
+  \item Connect to the board.
+        (This can be done by using PuTTY on Windows or a ssh command on Linux.)
+
+  \texttt{ssh root@ee-cy5soc3.ee.ic.ac.uk}
+  \item Program the FPGA.
+
+  \texttt{cd /home/\line(1,0){30}/scripts}
+
+  \texttt{./program\_fpga.sh output\_file.rbf}
+\end{enumerate}
+
+
+\section{Running Tests}
+
+\texttt{python -O ./run\_test.py [file]}
+
+If no file is provided, the software will enter a REPL, where the commands available are as follows.
+If a file is provided, the software will read each line and execute the commands with the same syntax requirements, except for \texttt{exit} which will not work in a file.
 
 \begin{table}[H]
   \centering
@@ -14,6 +117,7 @@
     bitset <a|b> <hex>  & Force bits to be 1 in auto mode. \\
     bitclr <a|b> <hex>  & Force bits to be 0 in auto mode. \\
     run <time>         & Runs the test for specified duration in ms. Prints the results at the end of the test. \\
+    exit               & Exits the REPL. \\
     \hline
   \end{tabular}
   \caption{Commands accepted in test REPL}
@@ -21,14 +125,14 @@
 
 Notes:
 \begin{itemize}
-  \item Arguments in angle brackets are required. Arguments in square brackets are optional. Vertical bars separate all possible options.
-  \item Frequency configuration is done by a PLL which has limited granularities. As such the actual frequency may differ from the desired frequency.
+  \item Arguments in angle brackets are required.
+        Arguments in square brackets are optional.
+        Vertical bars separate all possible options.
+  \item Frequency configuration is done by a PLL which has limited granularities.
+        As such the actual frequency may differ from the desired frequency.
   \item Argument \texttt{<a|b>} is used to select which input this command will apply to.
-  \item \texttt{<hex>} needs to be in the format \texttt{\textasciicircum(0x)?[0-9a-fA-F]\{1,8\}\$}. In words, it takes 1 to 8 digits of case-insensitive hexadecimal digits. No other characters including space or underscore is allowed, base prefixe \texttt{0x} is unnecessary but allowed.
+  \item \texttt{<hex>} needs to be in the format \texttt{\textasciicircum(0x)?[0-9a-fA-F]\{1,8\}\$}.
+        In words, it takes 1 to 8 digits of case-insensitive hexadecimal digits.
+        No other characters including space or underscore are allowed, base prefix \texttt{0x} is unnecessary but allowed.
   \item Under the current hardware environment, a safe range for \texttt{<speed>} in MHz is from 50 to 400.
 \end{itemize}
-
-
-\chapter{Raw Data}
-
-\textcolor{red}{+Code Snippets?}
