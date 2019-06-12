@@ -13,8 +13,8 @@
   \node [block] at ( 8,3)  (m) {Monitor};
   \node [block] at (16,3)  (u) {Reference};
   \node [inter] at ( 4,9)  (b) {HPS-FPGA Bridge};
-  \node [block] at ( 4,12) (w) {Test Script};
-  \node [block] at ( 4,15) (f) {Configuration};
+  \node [block] at ( 4,12) (w) {Test Software};
+  \node [block] at ( 2,15) (f) {Macro File};
 
   \draw[ ->, >=stealth] (r.east)           -- (d.west);
   \draw[ ->, >=stealth] (d.south)          |- (t.west);
@@ -23,7 +23,11 @@
   \draw[ ->, >=stealth] (b.south-|d.north) -- (d.north);
   \draw[ ->, >=stealth] (s.north)          -- (b.south-|s.north);
   \draw[<->, >=stealth] (b.north)          -- (w.south);
-  \draw[ ->, >=stealth] (f.south)          -- (w.north);
+  \draw[ ->, >=stealth] (f.south)          -- (w.north-|f.north);
   \draw[ ->, >=stealth] (d.east)           -- (m.west);
   \draw[<->, >=stealth] (m.east)           -- (u.west);
+  \draw[ ->, >=stealth] (2, 18)            -- (f.north);
+  \draw[ ->, >=stealth] (6, 18)            -- (w.north-|6,18);
+
+  \draw (-2,18) -- ++(6,0) -- node[above] {User Input} ++(5,0);
 \end{tikzpicture}

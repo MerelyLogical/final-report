@@ -1,5 +1,44 @@
 \chapter{Testing}
 
+\section{Functional Correctness}
+\subsection{Simulation}
+During implementation, the modules were simulated with ModelSim to verify their correctness.
+Initially we followed the data path of randomiser, driver, monitor, sub-monitor, and scoreboard, each module was attached and simulated.
+As the randomiser was a perfect source for setting up random tests for the following module, this process was relatively straightforward once the randomiser was ascertained to work correctly.
+Once the system design became stable, the testbench module can be simulated as a whole.
+Since RTL simulation is cheap, this is done after any design addition or change thereafter.
+As writing hardware can be a lot less intuitive than writing software, the simulations have prevented many errors from going on to the hardware.
+
+\subsection{FPGA Testing}
+After each major functional addition, the framework is tested as whole on the development board.
+This means that it is integrated with a test DUT, usually an adder, and the entire system is synthesised and programmed on the FPGA.
+A basic test script was written early on to for this system level testing.
+The FPGA testing serves to confirm the functional correctness shown by the software simulations.
+
+However, the confirmatory nature of the FPGA tests stopped after the number of sub-monitors instantiated by the monitor was made configurable.
+The test results no longer agrees with simulation results.
+To discover the cause of this discrepancy, another debug method was suggested by my supervisor.
+
+\subsection{Post-fit Simulation}
+Previously, the simulation was done with modules files before synthesis.
+In order to be closer to hardware, we can synthesise and fit the design with first, then with the \textit{EDA Netlist Writer}, a massive Verilog file can be generated containing the entire design.
+This can then be fed into ModelSim for a more accurate simulation.
+
+With this, a signal was found to be off by a clock cycle so we fixed it in the design.
+However, this was not sufficient, as the FPGA test results still differ from that of the post-fit simulation.
+The next proposed debug method by my supervisor is to use \textit{SignalTap}, which can probe signals inside of the FPGA, allowing us to see the actual waveforms in hardware.
+Being a much more time-consuming method, we decided to first take a closer look at the design code before committing to it.
+Among other issues, my supervisor was able to identify a clock which I have handled rather carelessly.
+After spending some time tidying up this clock, the system again behaved correctly as predicted by the simulation.
+
+\section{Maximum Frequency}
+As a important benchmark of the framework, the maximum frequency is closely monitored during the implementation process.
+This is done with \textit{TimeQuest Timing Analyser}, which is a tool that can provide an estimate on the maximum frequency the testbench and run safely on.
+If this value is lower than what is required, the tool can also provides a list of the slowest offending signal paths for us to optimise on.
+
+During FPGA tests, the physical maximum frequency the board can achieve is measured with a script that will run the same test repeatedly with increasing frequencies.
+These are useful as the software estimations are usually more conservative than what is possible on hardware.
+
 \section{Out-of-the-box Testing}
 \subsection{Introduction}
 In an out-of-the-box(OOTB) test, the product is delivered to test users as a packaged box.
@@ -55,6 +94,3 @@ A method of accomplishing both will be proposed in the further works chapter of 
 Another key improvement arising from the OOTB testing was on the readability of the user guide.
 It is difficult to produce a guide that will be suitable to readers in all skill levels.
 Therefore, while this one test has made it slightly better, feedback from more users and especially users with different levels of experience and knowledge is definitely still needed.
-
-
-
