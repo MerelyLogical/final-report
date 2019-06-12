@@ -25,3 +25,13 @@ What to do with stuff not actually implemented at report submission but already 
 Use of colors in the report
 
 afterburner FPGA card in Mac pro?
+
+1515 start
+
+no sip file from qsys?
+
+hps_0_h2f_reset_reset_n does not exist in macro function soc_inst
+
+define a|b -> its not m|a
+
+1717 end
