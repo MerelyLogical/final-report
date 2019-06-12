@@ -29,8 +29,7 @@ afterburner FPGA card in Mac pro?
 1515 start
 
 no sip file from qsys?
-
-hps_0_h2f_reset_reset_n does not exist in macro function soc_inst
+note for qsys refreshing
 
 define a|b -> its not m|a
 

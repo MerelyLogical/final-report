@@ -1,11 +1,60 @@
-\chapter{Out-of-the-box Testing}
+\chapter{Testing}
 
-\section{Introduction}
-In an out-of-the-box test, the product is delivered to test users as a packaged box.
-Then the unpacking process, in which the users sets up and uses the product, is observed to study the intuitiveness of the design.
+\section{Out-of-the-box Testing}
+\subsection{Introduction}
+In an out-of-the-box(OOTB) test, the product is delivered to test users as a packaged box.
+Its unpacking process, in which the users sets up and uses the product, is then observed to study the intuitiveness of the design.
 This testing method is used in this project as one of the key determinant for the success of this project is how convenient it is for users to configure and make use of the framework.
 
 For this project, we have made up a scenario where the users have designed an adder with a suspected error that they wish to ascertain.
 The user guide [Appendix \ref{appendix:guide}], the testbench, and a flawed adder design was provided to the test volunteers.
-If both inputs to the adder are o
-The test volunteers were made aware that there might be error is
+An extra piece of logic was added to an adder design, so that if both inputs are odd, the adder will produce an incorrect output.
+The test volunteers are made aware of the fact that there might be an error relating to the parity (evenness) of the inputs.
+
+Unfortunately, due to time constraints and the limited number of people with Quartus knowledge that I have access to, this test was only performed by me first and one volunteer after.
+Nevertheless, this process still proved to be helpful with many design flaws being identified, and a list of possible improvements being drawn out.
+The possible improvements will be discussed in the further work chapter of this report, while the identified flaws will be evaluated within this chapter.
+
+\subsection{Hardware Configuration}
+For the hardware portion, the test user were given adders of width 16 which is expected to work up to 3 times as fast as the reference.
+He was able to correctly modify the default values for \texttt{WIDTH} where is 32, and for \texttt{NUM\_SUB\_MON}, where the default is 2.
+However, there seemed to be an issue with Qsys where the widths of ports are not always updated when the module parameters are modified.
+As he had not much familiarity with Qsys, and was not expected to have any knowledge of the inner workings of the \texttt{test\_wrapper} module, the test had to be interrupted.
+To fix this, we deleted and re-added both the \texttt{test\_wrapper} and the \texttt{dut\_adder} module, modifying their their default values before their were placed into the \textit{System Contents} window.
+A note was also added in the user guide.
+
+After dealing with the minor obstacle, he was able to generate the HDL from Qsys, and compile the full design with Quartus without issues.
+
+\subsection{Using the Test Software}
+The uploading and the programming procedure was smooth, the volunteer followed the guide and successfully primed the development board for testing.
+
+He then had to read the command list of the testing software and devise a plan to pinpoint the relationship between the parity of the inputs and the correctness of the design output.
+At this point, he suggested that while some of the commands were explained succinctly, the commands on manipulating the inputs were not explained in sufficient detail and left him somewhat confused.
+As such, I explained the details and improved the user guide accordingly.
+
+While explaining, the volunteer quickly realised that he can use the \texttt{bitset} and \texttt{bitclr} commands to fix the evenness of the inputs.
+However, in doing so he typed in a series of instructions that the test software never had to deal with during initial testing.
+This revealed a bug in the software where the frequency of the PLL output is not well defined if the software issued a reset command after setting the frequency.
+
+After a second interruption to fix this bug, the test was able to continue.
+With some experimenting in the REPL interface, the user was able to correctly conclude that the design gives incorrect values only when both inputs are odd.
+Test automation was also tested, in which the volunteer had no trouble getting the software to run with his command list file.
+
+\subsection{Testing Results}
+Despite the two intermissions, the OOTB was reportedly a smooth experience for the test volunteer.
+This showed that the framework is reasonably intuitive and user-friendly.
+However, the test also highlighted a few major places where the project can do better in.
+
+Over the entire duration of the OOTB testing process, a significant amount of time was wasted fiddling with Quartus and Qsys GUIs.
+It was also the step most where the framework is the most prone to user mistakes.
+For example, a misclick in the Qsys \textit{System Contents} window may only cause an error during the synthesis of the entire project, and for someone not familiar with Qsys, this error may take a very long time to be identified and fixed.
+As such, having a way to automate the hardware configuration process would be a great improvement to the usability of the product.
+Furthermore, a unified configuration system would be even better, as the user will not have to figure out what customisation options have to be done in the GUIs before compile, and what can still be manipulated during in the testing software.
+A method of accomplishing both will be proposed in the further works chapter of this report.
+
+Another key improvement arising from the OOTB testing was on the readability of the user guide.
+It is difficult to produce a guide that will be suitable to readers in all skill levels.
+Therefore, while this one test has made it slightly better, feedback from more users and especially users with different levels of experience and knowledge is definitely still needed.
+
+
+
