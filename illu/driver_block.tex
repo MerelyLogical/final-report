@@ -10,6 +10,7 @@
   ]
 
 \node[block, label=above:Driver] (r) at (0,0) {};
+\node[draw, opacity=0, rectangle, minimum width=30em] () at (0,0) {};
 
 \draw [<-, sarrow] ($(r.west)+(0,4.5)$) -- ++(left:3) node[left] {clk};
 \draw [<-, sarrow] ($(r.west)+(0,3.5)$) -- ++(left:3) node[left] {reset};

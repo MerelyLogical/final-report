@@ -10,14 +10,15 @@
   ]
 
 \node[block, label=above:Sub-monitor] (r) at (0,0) {};
+\node[draw, opacity=0, rectangle, minimum width=30em] () at (0,0) {};
 
 \draw [<-, sarrow] ($(r.west)+(0,2)$) -- ++(left:3) node[left] {clk};
 \draw [<-, sarrow] ($(r.west)+(0,1)$) -- ++(left:3) node[left] {reset};
 
 \draw [<-, darrow] ($(r.west)-(0,1)$) -- ++(left:3) node[left] {i*};
-\draw [<-, darrow] ($(r.west)-(0,2)$) -- ++(left:3) node[left] {dut\_o};
+\draw [<-, darrow] ($(r.west)-(0,2)$) -- ++(left:3) node[left] {dut\_out};
 
-\draw [->, darrow] ($(r.east)-(0,1)$) -- ++(right:3) node[right] {mon\_o};
-\draw [->, darrow] ($(r.east)-(0,2)$) -- ++(right:3) node[right] {dtm\_o};
+\draw [->, darrow] ($(r.east)-(0,1)$) -- ++(right:3) node[right] {mon\_out};
+\draw [->, darrow] ($(r.east)-(0,2)$) -- ++(right:3) node[right] {dtm\_out};
 
 \end{tikzpicture}
