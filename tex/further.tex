@@ -1,5 +1,19 @@
 \chapter{Further Work}
 
+\section{Verilog Preprocessor}
+
+\subsection{Additional Customisation}
+\begin{enumerate}
+  \item LFSR with variable width
+  \item variable number of inputs/outputs to DUT
+\end{enumerate}
+
+\subsection{Unified Interface}
+\begin{enumerate}
+  \item Qsys
+  \item Quartus
+  \item Software
+\end{enumerate}
 \section{Automatic Delay Reconfiguration}
 
 Since finding out the delay of the DUT is useful for further simplifying the configuration process of the framework, a delay tester is built within the driver.
@@ -38,3 +52,7 @@ The delay counter \texttt{delay\_out} increments itself every cycle if the FSM i
 When the FSM enters the DONE state, we the value of the delay counter is the delay of the DUT.
 With a 3-bit counter as shown in the timing diagram, it can measure this delay for up to 8 clock cycles.
 Longer delays can be measured by extending the width of \texttt{out\_count}.
+
+\subsection{Reference Delay}
+Currently reference is sub-monitor -> which needs to pass through dut\_out as well.
+To have a pure module, need this delay control.

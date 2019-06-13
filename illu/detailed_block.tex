@@ -1,0 +1,63 @@
+\begin{tikzpicture}
+  [
+    x=1em, y=1em,
+    block/.style =
+      {draw, rectangle, align=center, minimum width=4em, minimum height=6em},
+    sarrow/.style =
+      {>={Stealth}, font=\ttfamily},
+    darrow/.style =
+      {double distance=1.5pt, >={Stealth}, font=\ttfamily}
+  ]
+  \node [block, label=above:Randomiser]  at ( 8, 10)  (r) {};
+  \node [block, label=above:Driver]      at (16, 10)  (d) {};
+  \node [block, label=above:DUT]         at (24,  0)  (t) {};
+  \node [block, label=above:Monitor]     at (32, 10)  (m) {};
+  \node [block, label=below:Sub-monitor] at (36,  0)  (u) {};
+  \node [block, label=above:Scoreboard]  at (40, 10)  (s) {};
+
+  \draw [->, sarrow] (2,15) node[left] {enable}
+                      -| ($(r.west)+(-1,2)$)
+                      -- ($(r.west)+(0,2)$);
+  \draw [->, sarrow] (2,16) node[left] {f\_*}
+                      -| ($(d.west)+(-1,2)$)
+                      -- ($(d.west)+(0,2)$);
+  \draw [->, sarrow] (2,17) node[left] {freeze}
+                      -| ($(s.west)+(-1,2)$)
+                      -- ($(s.west)+(0,2)$);
+
+  \draw [->, sarrow] ($(d.east)-(0,2)$)
+                      -| ++(1,-2)
+                      -- ++(-14,0)
+                      |- node[left] {initial} ($(r.west)-(0,2)$);
+  \draw [->, darrow] ($(r.east)+(0,0)$)
+                      -- node[above] {rand\_*} ($(d.west)+(0,0)$);
+  \draw [->, darrow] ($(d.east)+(0,1)$)
+                      -- node[above] {drive\_mon\_*} ($(m.west)+(0,1)$);
+  \draw [->, darrow] ($(d.east)-(0,1)$)
+                      -- ++(2,0)
+                      -- node[right,pos=0] {drive\_dut\_*} ($(t.west)+(-2,0)$)
+                      -- ($(t.west)+(0,0)$);
+  \draw [->, darrow] ($(t.east)-(0,0)$)
+                      -- ++(2,0)
+                      -- node[right,pos=0] {dut\_out} ($(m.west)-(2,1)$)
+                      -- ($(m.west)-(0,1)$);
+  \draw [->, darrow] ($(t.east)+(2,0)$)
+                      |- ($(d.west)-(1,14)$)
+                      |- ($(d.west)-(0,2)$);
+  \draw [->, darrow] ($(m.south)-(1,0)$)
+                      -- ++(0,-2.5)
+                      -- node[below,pos=0.2] {mon\_i\_*} ($(u.north)-(1,-1.5)$)
+                      -- ($(u.north)-(1,0)$);
+  \draw [<-, darrow] ($(m.south)+(1,0)$)
+                      -- ++(0,-1.5)
+                      -- node[above,pos=0.8] {mon\_out} ($(u.north)+(1,2.5)$)
+                      -- ($(u.north)+(1,0)$);
+  \draw [->, darrow] ($(m.east)+(0,0)$)
+                      -- node[above] {diff} ($(s.west)+(0,0)$);
+  \draw [->, sarrow] ($(m.east)-(0,2)$)
+                      -- node[above] {ready} ($(s.west)-(0,2)$);
+  \draw [->, sarrow] ($(s.east)+(0,2)$)
+                      -| ++(1,5)
+                      -- (46,17) node[right] {results};
+
+\end{tikzpicture}

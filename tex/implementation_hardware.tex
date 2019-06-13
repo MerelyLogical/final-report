@@ -1,59 +1,5 @@
 \chapter{Hardware Implementation}
 
-\section{Project Hierarchy}
-Programming the FPGA to communicate with the HPS is no trivial task.
-Luckily, there exists a golden system reference design~\cite{Rocket1} for the board in use for this project.
-Unfortunately, support for certain versions of Quartus are missing from the GSRD download database, including the version used for this project, 16.0.
-While the design can be opened with a different version of the software, it causes a series of conflicts usually related to using IP cores that have changed over the iterations.
-To circumvent this issue cleanly, GSRD version 14.1 was downloaded and compiled on a separate install of Quartus II 14.1.
-This allowed the reference design to be studied in detail, and the sections required for this project to be rebuilt with Quartus Prime 16.0.
-
-\begin{figure}[H]
-  \centering
-  \input{illu/golden_ref_hierarchy}
-  \caption{Hierarchy of the Golden Reference Design}
-  \label{Golden Hierarchy}
-\end{figure}
-
-By examining the structure of the reference design, we see that it has a top-level wrapper called the \texttt{sys\_top}, which instantiates the Qsys system \texttt{soc\_system} and a few IP blocks that handles the low level hardware controls on the development board.
-This Qsys system is of the most interest to us as it contains the module \texttt{hps}.
-In \texttt{hps}, there are 3 ports named \texttt{h2f\_axi\_master}, \texttt{h2f\_axi\_slave}, and \texttt{h2f\_lw\_axi\_master}, cooresponding to the bridges exposed by the HPS for connections~\cite{Altera6}.
-
-With this knowledge, we can insert the testbench design into this hierarchy by having it wrapped into a Qsys module, with an open port that works as a slave to the AXI bridge.
-As the traffic passing through the HPS-FPGA bridge is minimal in our design, the lightweight bridge will be used for its simplicity.
-
-As the testbench only requires a list of registers to be sparingly read and written to, the logic required for the signals on the Avalon slave interface can be handwritten according to the interface specifications~\cite{Intel3} without much trouble.
-
-By following the naming conventions  the signals allows Qsys Component Editor to automatically detect the Avalon slave from this module at analysis.
-This saves the troubles of editing the \texttt{\_hw.tcl} file.
-This is done in the module \texttt{text\_wrapper}.
-
-Since Qsys is chosen as the user interface, it makes sense to also put the DUT and the reference design at this level in the hierarchy.
-This means that the user only needs to use Qsys to swap in new designs.
-As such, other than handling the interface to the HPS, the wrapper module also exposes conduits that connects to the DUT and the references designs.
-
-In addition, the PLL and its reconfiguration module are also instantiated at this level since as packaged IP cores, Qsys is designed for such integrations.
-
-\begin{figure}[H]
-  \centering
-  \input{illu/hierarchy}
-  \caption{Hierarchy of the Full Hardware System}
-  \label{Hierarchy}
-\end{figure}
-
-The main section of the testbench is instantiated in the wrapper as a separate module aptly named \texttt{testbench}.
-This module instantiates and connects all main components of the testbench.
-While this module seems unnecessary, being another wrapper in a bigger wrapper, it does however, provide 2 advantages.
-
-Firstly, it simplifies the development cycle of the framework.
-During the compilation of a Qsys system, all relevant files are copied into a folder and the system is rendered as a Verilog file that has its direct dependencies contained in that folder.
-While this is arguably a benefit in terms of dependency management, it makes the development more difficult since whenever something is changed in the interface between testbench modules, the entire \texttt{soc\_system} needs to be recompiled to update the dependencies.
-If forgotten, it can cause confusions as the testbench could be still on the old iteration even though a new compilation at the \texttt{sys\_top} level has been performed.
-
-Secondly, it makes the simulation of the testbench more straight forward.
-Verifying the correctness of the Avalon slave in the wrapper is important, but there is no need to go through the interface protocol whenever a new input signal is desired in testbench simulations.
-Having the \texttt{testbench} module allows direct manipulation and examination of the signals in and out of the testbench, without worrying about the HPS side of things in simulations.
-
 \section{Randomiser}
 
 \begin{figure}[H]
