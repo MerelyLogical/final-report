@@ -1,14 +1,132 @@
 \chapter{Software Design}
 
-\section{Code Structure}
-The test script runs on the HPS of SoC board, providing an interface for the user to run their tests on the FPGA.
-It is able to control the frequency of the FPGA and configure the testbench according to the need of the user.
-It should also read from the scoreboard to results to the user.
+\section{Interface Design}
+The software should provide a layer of abstraction so that the user can run tests without worrying about too many technical details.
+The abstraction needs to be intuitive, but it should not compromise on the level of control given to the user.
+Based on the hardware design, a list of items that should be controllable by the user at the software level is drafted.
 
+\begin{enumerate}
+  \setlength\itemsep{0pt}
+  \item Operating mode (manual or auto)
+  \item Manual inputs in manual mode
+  \item Bitset/Bitclr control in auto mode
+  \item Test duration
+  \item PLL frequency
+\end{enumerate}
 
+All other variables such as the exact memory locations accessed and the binary values being read and written should be hidden away by the interface.
+For example, while the \texttt{freeze} signal in the scoreboard is exposed to the HPS-FPGA Bridge, the user will not have to manually assert the signal.
+The signal should be automatically asserted by the software before results were collected for the scoreboard, ensuring the scoreboard registers are not still counting during the read process.
+Allowing manual control of this signal would only require unnecessary effort from the user, thus it should be one of the items abstracted away by the software.
+However, the code still needs to be constructed in a way, such that an expert user attempting to modify the bridge interface should be able to do so without much trouble.
 
-\section{Software Configuration}
-In order to improve usability, the user interface of the software should not include direct manipulation of the code.
-While this is not an excuse for messy and unreadable code, having a separate configuration file is much more user friendly.
-This configuration file will be in YAML to make all the options available to edit.
-The Python test software can then parse these with the \texttt{pyyaml} library and run accordingly.
+Two options were considered here.
+
+\subsection{Configuration File}
+One possible arrangement is to set up a configuration file for the software.
+We can have a YAML file that lists all the default values for the controls.
+These values can then be edited by the user to their liking.
+YAML is chosen as its Python-like appearance and its easiness to read and edit.
+Python, the language which the software is written in, also has good support for parsing YAML files with the \texttt{pyyaml} library.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{.35\linewidth}
+  \begin{verbatim}
+mode: auto
+bitset:
+  a: 00000001
+  b: 00000000
+bitclr:
+  a: 00000000
+  b: 00000001
+input:
+  - a: 00000000
+    b: 00000000
+freq: 200
+runtime: 60
+  \end{verbatim}
+  \caption{Config File 1}
+  \label{autoYMAL}
+  \end{minipage}%
+  \begin{minipage}[b]{.35\linewidth}
+  \begin{verbatim}
+mode: manual
+bitset:
+  a: 00000000
+  b: 00000000
+bitclr:
+  a: 00000000
+  b: 00000000
+input:
+  - a: deadf00d
+    b: fadef00d
+  - a: feedf00d
+    b: cafef00d
+freq: 100
+runtime: 5
+  \end{verbatim}
+  \caption{Config File 2}
+  \label{manYMAL}
+  \end{minipage}
+\end{figure}
+
+Looking at the configuration file excerpts, Figure \ref{autoYMAL} will make the test run in auto mode for 60 seconds at 200MHz.
+Input \texttt{a} will be always odd, and input \texttt{b} will always be even.
+Figure \ref{manYMAL} on the other hand will make the test run in manual mode, in which the testbench will go through the list of inputs stated under the input key.
+Once the list is exhausted, the test will terminate.
+
+This method is great for setting up one or two tests, but to scale this up to series of tests, the user may have to generate a collection of such configuration files.
+The test software can then scan a folder instead of just a single file and run all tests.
+
+If there happened to be significant extensions to the interface in the future, the user will also have to go through many configuration options that maybe irrelevant to the test case.
+This increases the cognitive load unnecessarily, reducing the user-friendliness of the design.
+
+\subsection{Read-eval-print Loop}
+
+Alternatively, the software can be structured into a read-eval-print loop (REPL).
+This is a simple interactive command line interface, where the program reads a single user expression, evaluates it, and prints out a response.
+The software then waits for the next user input, and so the loop continues until the user decides to stop.
+
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{.5\linewidth}
+  \begin{verbatim}
+> mode auto
+> bitset a 00000001
+> bitclr b 00000001
+> freq 200
+PLL Configured to 200.00MHz
+> run 60
+Results: ...
+  \end{verbatim}
+  \caption{CLI Excerpt 1}
+  \label{autoREPL}
+  \end{minipage}%
+  \begin{minipage}[b]{.5\linewidth}
+  \begin{verbatim}
+> mode manual
+> input a 00010001
+> input b 000a000c
+> input a feedf00d
+> input b cafef00d
+> freq 100
+PLL Configured to 100.00MHz
+> run 1
+Results: ...
+  \end{verbatim}
+  \caption{CLI Excerpt 2}
+  \label{manREPL}
+  \end{minipage}
+\end{figure}
+
+This allows the user to intuitively command the software.
+Figure \ref{autoREPL} and Figure \ref{manREPL} shows possible commands the user may use to achieve the same effect as the previous option with configuration files.
+The user can now go directly to the option that needs to be changed, and if a mistake with the configuration was found when looking at the test results, the user can immediately make adjustments within the software's command line interface (CLI).
+This means the user can be more exploratory, as REPL is more interactive and direct than having to reset, edit a file, run again, and then debug.
+
+In order to scale this option, the software can be easily modified to also accept a macro file as well.
+Instead of typing in individual commands in the CLI, the user can enter all the necessary commands as lines of a file, and feed that into the software.
+The macro file can then be scaled and automated so series of tests can be easily ran with a single instruction from the user.
+
+Being the more user-friendly and more scalable option, this option will be implemented in the next phase of the project.

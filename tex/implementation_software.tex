@@ -21,3 +21,24 @@ This incurs a significant overhead, thus slowing it down.
 
 \subsection{New Stuff Here}
 Most interactions through the HPS-FPGA bridge involves writing and reading different memory locations.
+
+To set up a REPL, we need to define a list of expressions that the user is allowed to give to the program. (not tcl?)
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|>{\ttfamily}p{11em}|p{\dimexpr\textwidth-18em}|}
+    \hline
+    \textrm{Command}   & Explanation \\
+    \hline
+    reset              & Resets the system and test results. \\
+    version            & Prints the system version. \\
+    freq <speed>       & Sets the clock speed to the specified value in MHz. Prints the actual frequency configured. \\
+    mode <m|a>         & Choose between \underline{m}anual and \underline{a}uto test mode. \\
+    manual <a|b> <hex>  & Give input in manual mode. \\
+    bitset <a|b> <hex>  & Force bits to be 1 in auto mode. \\
+    bitclr <a|b> <hex>  & Force bits to be 0 in auto mode. \\
+    run <time>         & Runs the test for specified duration in ms. Prints the results at the end of the test. \\
+    exit               & Exits the REPL. \\
+    \hline
+  \end{tabular}
+  \caption{Commands accepted in test REPL}
+\end{table}
