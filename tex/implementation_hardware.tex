@@ -29,9 +29,16 @@ The filter select signal \texttt{f\_select} selects the mode of operation of the
 When it is set, the driver will read from \texttt{f\_manual} and feed them to the output.
 Otherwise, the driver will take the output of the randomisers at \texttt{rand\_*}, set and clearing specific bits according to \texttt{f\_bitset} and \texttt{f\_bitclr}.
 
-The output is immediately sent to the DUT from the ports \texttt{drive\_*}.
-The output is also delayed for a number of cycles before being sent to the monitor from the ports \texttt{drive\_delayed\_*}.
+The output is immediately sent to the DUT from the ports \texttt{drive\_dut\_*}.
+The output is also delayed for a number of cycles before being sent to the monitor from the ports \texttt{drive\_mon\_*}.
 This delay is known and thus can be configured by the user before compiling the testbench.
+
+\begin{figure}[H]
+  \centering
+  \input{illu/driver_wave}
+  \caption{Driver Waveform}
+  \label{DriveWave}
+\end{figure}
 
 \section{Monitor}
 \begin{figure}[H]
@@ -50,35 +57,11 @@ This delay is known and thus can be configured by the user before compiling the 
   \label{SubmonBlk}
 \end{figure}
 
-\textcolor{red}{2 Pages here, waveform diagram not correct}
 \begin{figure}[H]
   \centering
-  \begin{tikztimingtable}
-    [
-      xscale=4,
-      timing/d/background/.style={fill=white},
-      timing/font=\ttfamily
-    ]
-    dist\_ctr & D{8} 2{D{1}D{2}D{4}D{8}} D{1}D{2}         \\
-    a & U D{AA}D{AB}D{AC}D{AD}D{AE}D{AF}D{AG}D{AH}D{AI} U \\
-    b & U D{BA}D{BB}D{BC}D{BD}D{BE}D{BF}D{BG}D{BH}D{BI} U \\
-    s & 3U D{SA}D{SB}D{SC}D{SD}D{[red]SK}D{SF}D{SG}D      \\
-    \\
-    dist\_ctr  [0] & L 2{H 3L} HL \\
-    a\_mon     [0] & U 4D{AA} 4D{AE} 2D{AI} \\
-    b\_mon     [0] & U 4D{BA} 4D{BE} 2D{BI} \\
-    s\_mon     [0] & 2U 4D{SA} 4D{SE} D \\
-    sub\_event [0] & 8LH2L \\
-  \extracode
-    % Add vertical lines in two colors
-    \begin{pgfonlayer}{background}
-      \begin{scope}[semitransparent,semithick]
-        \vertlines{1,2,...,10}
-      \end{scope}
-    \end{pgfonlayer}
-  \end{tikztimingtable}
-  \caption{Distributed Monitoring System}
-  \label{DisMon}
+  \input{illu/monitor_wave}
+  \caption{Monitor Waveform}
+  \label{MonitorWave}
 \end{figure}
 
 \section{Scoreboard}
@@ -88,4 +71,11 @@ This delay is known and thus can be configured by the user before compiling the 
   \input{illu/scoreboard_block}
   \caption{Scoreboard Block Diagram}
   \label{ScoreboardBlk}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \input{illu/scoreboard_wave}
+  \caption{Scoreboard Waveform}
+  \label{ScoreboardWave}
 \end{figure}

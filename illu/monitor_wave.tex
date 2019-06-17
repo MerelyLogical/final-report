@@ -1,0 +1,25 @@
+\begin{tikztimingtable}
+  [
+    xscale=4,
+    timing/d/background/.style={fill=white},
+    timing/font=\ttfamily
+  ]
+  clk           & h 19{c} \\
+  dist\_ctr     & D{100} 3{D{001}D{010}D{100}} \\
+  drive\_mon\_a & U D{0123} 2U D{3210} 2U D{0213} 2U \\
+  drive\_mon\_b & U D{4567} 2U D{7654} 2U D{4657} 2U \\
+  dut\_out      & U D{468a} 2U D{a861} 2U D{486a} 2U \\
+  clk\_sub  [0] & 2L 2{2{c} 2L} 2{c} L \\
+  a         [0] & 2U 3D{0123} 3D{3210} 2D{0213} \\
+  b         [0] & 2U 3D{4567} 3D{7654} 2D{4657} \\
+  dut\_o    [0] & 2U 3D{468a} 3D{a861} 2D{486a} \\
+  mon\_o    [0] & 2U 3D{468a} 3D{a864} 2D{486a} \\
+  diff          & 2U 3U D{0000} 2U D{0005} U \\
+\extracode
+  % Add vertical lines in two colors
+  \begin{pgfonlayer}{background}
+    \begin{scope}[semitransparent,semithick]
+      \vertlines{1,2,...,9}
+    \end{scope}
+  \end{pgfonlayer}
+\end{tikztimingtable}

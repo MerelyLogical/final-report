@@ -34,3 +34,10 @@ note for qsys refreshing
 define a|b -> its not m|a
 
 1717 end
+
+Want hardcopy?
+How to show FPGA speedup vs simulation? just clock simulation
+How to justify architecture?
+Wow factor
+delay tester limitations
+

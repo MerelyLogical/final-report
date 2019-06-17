@@ -1,0 +1,21 @@
+\begin{tikztimingtable}
+  [
+    xscale=4,
+    timing/d/background/.style={fill=white},
+    timing/font=\ttfamily
+  ]
+  clk        & h 21{c} \\
+  rand       & D{a4fe}D{527f}D{a93f}D{d49f}D{ea4f}D{7527}D{ba93}D{5d49}D{2ea4}D{1752}D{8ba9} \\
+  f\_bitset  & 4D{0000} 7D{0004} \\
+  f\_bitclr  & 3D{0000} 3D{f000} 5D{0000} \\
+  drive\_dut & U D{a4fe}D{527f}D{a93f}D{049f}D{0a4f}D{0527}D{ba97}D{5d4d}D{1756}D{8bad} \\
+  drive\_mon & 3U D{a4fe}D{527f}D{a93f}D{049f}D{0a4f}D{0527}D{ba97}D{5d4d} \\
+  dut\_out   & 3U D{a4fe}D{527f}D{a93f}D{049f}D{0a4f}D{0527}D{ba97}D{5d4d} \\
+\extracode
+  % Add vertical lines in two colors
+  \begin{pgfonlayer}{background}
+    \begin{scope}[semitransparent,semithick]
+      \vertlines{1,2,...,10}
+    \end{scope}
+  \end{pgfonlayer}
+\end{tikztimingtable}
