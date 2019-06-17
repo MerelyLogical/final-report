@@ -46,7 +46,7 @@ For clarity, unnecessary signals and signal values are omitted.
 
 In the example waveform, we assume the design is a simple 1 input 1 output module where the input is passed to the output after 2 cycles.
 The driver passed \texttt{rand} to \texttt{drive\_dut} after a cycle.
-When \texttt{f\_bitclr} is \texttt{f000}, the top 4 bits of the output are set to 0, and when \texttt{f\_bitset} is \texttt{0004}, bit 2 of the output is set to 1.
+When \texttt{f\_bitclr} is \texttt{0xf000}, the top 4 bits of the output are set to 0, and when \texttt{f\_bitset} is \texttt{0x0004}, bit 2 of the output is set to 1.
 It should be noted, that if the same bit is set and cleared by the user, \texttt{f\_bitclr} takes priority.
 This is an arbitrary choice, and is noted in the user guide.
 
@@ -101,8 +101,8 @@ With 3 sub-monitors, the width of \texttt{dist\_ctr} is 3, and its lowest bit co
 As it ticks, the I/O values are copied into the register arrays and held for 3 cycles.
 Within this time, the reference design completes its operation, fixing the value on \texttt{mon\_o}.
 When the cycle of \texttt{dist\_ctr} goes a full cycle and the \texttt{sub\_clk} ticks again, this value is collected back and XOR'ed to form the final output of the monitor, \texttt{diff}.
-In the example of Figure \ref{MonitorWave}, the second result was an error on the DUT, as it gave \texttt{a861} while the reference answer was \texttt{a864}.
-This means bit 0 and 2 were different, and \texttt{diff} is thus \texttt{0005}.
+In the example of Figure \ref{MonitorWave}, the second result was an error on the DUT, as it gave \texttt{0xa861} while the reference answer was \texttt{0xa864}.
+This means bit 0 and 2 were different, and \texttt{diff} is thus \texttt{0x0005}.
 
 The other sub-monitors all work identically but each 1 DUT cycle later the last.
 This allows the reference design to run slower than the DUT, to still provide a constant stream of \texttt{diff} at the monitor output as designed.
@@ -143,11 +143,18 @@ As such, there is great incentive in the future to build a better communication 
 Figure \ref{ScoreboardWave} shows a example waveform.
 The counters and the extrema trackers changes value only if we have \texttt{mon\_ready \&\& !freeze}.
 
-\section{Summary}
+\section{Wrappers}
 
 Figure \ref{DBlock} provides a detailed look at how the individual hardware components are wired together to form the \texttt{testbench} module.
-The inputs and outputs of this module is contained within \texttt{test\_wrapper}, which handles the AXI communications when coupled with the \texttt{hps} module.
-As discussed in the software implementation chapter, this allowed the software to access the testbench, completing the overall system implementation.
+The DUT is shown as internal for clarity and it is the case during simulation testing of the testbench, but it should be understood that the DUT module is external in actual use.
+The reference module similarly, is implied to be contained within the sub-monitor module, but this can be external during hardware use.
+
+\begin{figure}[H]
+  \centering
+  \input{illu/wrapper_block}
+  \caption{Test Wrapper Block Diagram}
+  \label{WrapperBlk}
+\end{figure}
 
 \begin{sidewaysfigure}
   \begin{figure}[H]
@@ -158,3 +165,46 @@ As discussed in the software implementation chapter, this allowed the software t
   \end{figure}
 \end{sidewaysfigure}
 
+The inputs and outputs of this module is contained within \texttt{test\_wrapper}, which handles the AXI communications when coupled with the \texttt{hps} module.
+This allowed the software to access the testbench, completing the overall system implementation.
+In addition to the AXI interface, the conduits to external design and reference modules, we should also see that the wrapper has two clock inputs, since the AXI interface is clocked differently to the rest of the testbench.
+
+All I/O signals are given an address on the HPS-FPGA Bridge.
+They are listed as follows in Table \ref{MemLoc}.
+The prefix \texttt{I}, \texttt{O}, or \texttt{D} indicates that the register is write only, read only, or read/write respectively.
+All register names follow closely to that of the signal, except for \texttt{reset}, \texttt{enable}, and \texttt{freeze}, which has been collected into one \texttt{D\_CTRL} register.
+They are bit 0, 1, and 2 of the register, respectively.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|>{\ttfamily}l|>{\ttfamily}l|}
+    \hline
+    \textrm{Register}   & \textrm{Location} \\
+    \hline
+    D\_CTRL       & 6'h00 \\
+    O\_SYSVER     & 6'h04 \\
+    \hline
+    I\_FSELECT    & 6'h10 \\
+    I\_FMANUAL\_A & 6'h14 \\
+    I\_FMANUAL\_B & 6'h18 \\
+    I\_FBITSET\_A & 6'h1C \\
+    I\_FBITSET\_B & 6'h20 \\
+    I\_FBITCLR\_A & 6'h24 \\
+    I\_FBITCLR\_B & 6'h28 \\
+    O\_DUTDELAY   & 6'h2C \\
+    \hline
+    O\_DATCTR     & 6'h30 \\
+    O\_ERRCTR     & 6'h34 \\
+    O\_MAXACC     & 6'h38 \\
+    O\_MINACC     & 6'h3C \\
+    \hline
+  \end{tabular}
+  \caption{Memory Locations in the Test Wrapper}
+  \label{MemLoc}
+\end{table}
+
+The listed values are relative addresses.
+As specified in the manual, the lightweight bridge is physically at \texttt{0xFF20\_0000}~\cite{Altera6}.
+As the golden reference design already uses some of the lower values in this bridge, an offset address of \texttt{0x0010\_0000} was given to the test wrapper.
+For example, the physical address of \texttt{O\_SYSVER} is \texttt{0xFF30\_0004}.
+The PLL configuration also shares the same bridge, so it was given an offset address of \texttt{0x0011\_0000}.

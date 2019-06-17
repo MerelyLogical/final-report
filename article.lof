@@ -1,0 +1,41 @@
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Computing $y=\sqrt {(a+b)cd/(e-f)}$ with serial online operators\nobreakspace {}\cite {Ercegovac1}\relax }}{7}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Block diagram of the testbench design\relax }}{12}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Structure of the System-on-Chip\relax }}{13}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Fibonacci Configuration\relax }}{17}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Galois Configuration\relax }}{18}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Horizontal Structure\relax }}{18}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Vertical Structure\relax }}{19}
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Structure of a Lazy Monitor\relax }}{22}
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Structure of a Parallel Monitor\relax }}{22}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Config File 1\relax }}{26}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Config File 2\relax }}{26}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces CLI Excerpt 1\relax }}{27}
+\contentsline {figure}{\numberline {6.4}{\ignorespaces CLI Excerpt 2\relax }}{27}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {7.1}{\ignorespaces Hierarchy of the Golden Reference Design\relax }}{28}
+\contentsline {figure}{\numberline {7.2}{\ignorespaces Hierarchy of the Full Hardware System\relax }}{29}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {8.1}{\ignorespaces Randomiser Block Diagram\relax }}{31}
+\contentsline {figure}{\numberline {8.2}{\ignorespaces Driver Block Diagram\relax }}{31}
+\contentsline {figure}{\numberline {8.3}{\ignorespaces Driver Waveform\relax }}{32}
+\contentsline {figure}{\numberline {8.4}{\ignorespaces Monitor Block Diagram\relax }}{32}
+\contentsline {figure}{\numberline {8.5}{\ignorespaces Sub-monitor Block Diagram\relax }}{33}
+\contentsline {figure}{\numberline {8.6}{\ignorespaces Monitor Waveform\relax }}{34}
+\contentsline {figure}{\numberline {8.7}{\ignorespaces Scoreboard Block Diagram\relax }}{34}
+\contentsline {figure}{\numberline {8.8}{\ignorespaces Scoreboard Waveform\relax }}{35}
+\contentsline {figure}{\numberline {8.9}{\ignorespaces Test Wrapper Block Diagram\relax }}{36}
+\contentsline {figure}{\numberline {8.10}{\ignorespaces Block diagram of the implemented testbench\relax }}{37}
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {13.1}{\ignorespaces Delay Tester FSM\relax }}{49}
+\contentsline {figure}{\numberline {13.2}{\ignorespaces 3-bit Delay Tester Waveform\relax }}{49}
+\addvspace {10\p@ }
