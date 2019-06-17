@@ -53,16 +53,3 @@ If forgotten, it can cause confusions as the testbench could be still on the old
 Secondly, it makes the simulation of the testbench more straight forward.
 Verifying the correctness of the Avalon slave in the wrapper is important, but there is no need to go through the interface protocol whenever a new input signal is desired in testbench simulations.
 Having the \texttt{testbench} module allows direct manipulation and examination of the signals in and out of the testbench, without worrying about the HPS side of things in simulations.
-
-\begin{sidewaysfigure}
-  \begin{figure}[H]
-    \centering
-    \input{illu/detailed_block}
-    \caption{Block diagram of the implemented testbench}
-    \label{DBlock}
-  \end{figure}
-\end{sidewaysfigure}
-
-Figure \ref{DBlock} provides a detailed look at how the individual hardware components are wired together to form the \texttt{testbench} module.
-The inputs and outputs of this module is contained within \texttt{test\_wrapper}, which handles the AXI communications when coupled with the \texttt{hps} module.
-As discussed in the software implementation chapter, this allowed the software to access the testbench, completing the overall system implementation.
