@@ -40,6 +40,18 @@ This delay is known and thus can be configured by the user before compiling the 
   \label{DriveWave}
 \end{figure}
 
+Figure \ref{DriveWave} shows how the waveform of the implemented driver looks like when operating in auto mode.
+It should be stated that all waveforms in this report has been obtained from simulation, and are verified to be correct.
+For clarity, unnecessary signals and signal values are omitted.
+
+In Figure \ref{DriveWave}, we assume the design is a simple 1 input 1 output module where the input is passed to the output after 2 cycles.
+The driver passed \texttt{rand} to \texttt{drive\_dut} after a cycle.
+When \texttt{f\_bitclr} is \texttt{f000}, the top 4 bits of the output are set to 0, and when \texttt{f\_bitset} is \texttt{0004}, bit 2 of the output is set to 1.
+It should be noted, that if the same bit is set and cleared by the user, \texttt{f\_bitclr} takes priority.
+This is an arbitrary choice, and is noted in the user guide.
+
+The driver delays the output to monitor by 2 cycles, and we can see that this aligns it the output from the DUT.
+
 \section{Monitor}
 \begin{figure}[H]
   \centering
@@ -47,6 +59,17 @@ This delay is known and thus can be configured by the user before compiling the 
   \caption{Monitor Block Diagram}
   \label{MonitorBlk}
 \end{figure}
+
+The monitor takes DUT inputs from the driver, and distributes them to a few sub-monitors.
+Each sub-monitor containing a reference design then produces the correct results \texttt{mon\_out} from the inputs with a relaxed time budget.
+The monitor then checks the difference between the reference output, \texttt{mon\_out}, and the DUT output, \texttt{dut\_out} with XOR gates.
+This results in \texttt{diff}, where each bit set to 1 indicates a wrong bit in the DUT output.
+
+As the number of sub-monitors and the width of the tested unit are parametrised, the design of the distributor was not straightforward.
+A one-hot counter is set up to determined the currently active sub-monitor.
+A 2D register array of size \texttt{WIDTH} $\times$ \texttt{NUM\_SUB\_MON} is also created for each input or output of the design.
+These serves as the interface between the sub-monitors and the rest of the design, since the sub-monitors are clocked \texttt{NUM\_SUB\_MON} times slower.
+
 
 \subsection{Sub-monitors}
 
@@ -56,6 +79,9 @@ This delay is known and thus can be configured by the user before compiling the 
   \caption{Sub-monitor Block Diagram}
   \label{SubmonBlk}
 \end{figure}
+
+The current sub-monitor is an imperfect implementation of the reference module in the architecture design.
+
 
 \begin{figure}[H]
   \centering
