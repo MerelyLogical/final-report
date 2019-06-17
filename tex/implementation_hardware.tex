@@ -124,12 +124,12 @@ Another implication of the current bridge set up is that there is no simple way 
 This is a limitation of the current implementation, and will be discussed in the Further work section of this report.
 Therefore, the hardware will have to do some simple statistics.
 
-Since we are interested in how the accuracy of the DUT degrades as the frequency increases, two signals are created to record the maximum and the minimum accuracy of the DUT output.
-Calculating the accuracy with the \texttt{diff} signal means counting the number of leading zeros (\texttt{CLZ}), as zeros indicate the correct bits.
+Since we are interested in how the precision of the DUT degrades as the frequency increases, two signals are created to record the maximum and the minimum precision of the DUT output.
+Calculating the precision with the \texttt{diff} signal means counting the number of leading zeros (\texttt{CLZ}), as zeros indicate the correct bits.
 As the current implementation is limited with a maximum width of 32, the easiest way of doing \texttt{CLZ} fast is by padding zeros after the number to 32 bits, and then use a large lookup table with don't cares.
-This accuracy signal is named \texttt{acc}.
+This precision signal is named \texttt{acc}.
 
-To keep track of the minimum accuracy, register \texttt{minacc} is first initialised to the maximum, and then for each smaller value observed, it will take on its smaller value.
+To keep track of the minimum precision, register \texttt{minacc} is first initialised to the maximum, and then for each smaller value observed, it will take on its smaller value.
 The comparison logic here is relatively expensive in this fast testbench design.
 As such, there is great incentive in the future to build a better communication method to allow offloading these operations to the HPS.
 
@@ -142,7 +142,6 @@ As such, there is great incentive in the future to build a better communication 
 
 Figure \ref{ScoreboardWave} shows a example waveform.
 The counters and the extrema trackers changes value only if we have \texttt{mon\_ready \&\& !freeze}.
-
 
 \section{Summary}
 
