@@ -25,13 +25,12 @@ First the software calls the \texttt{cleanreset} function in class \texttt{wrapp
 This calls the a function to set the reset bit and then clears it.
 It also clears the enable signal and the freeze signal.
 Then it writes all zeros to all driver filter control registers, completing the wrapper side reset.
-
-Then the software calls a function in class \texttt{pll}, which sets the PLL frequency back to the default value.
-
+Then the software calls a function in class \texttt{pll}, which sets the PLL frequency back to the default value, thus fully resets the whole system.
 
 \subsection{Read-eval-print Loop}
 
-To set up a REPL, we need to define a list of expressions that the user is allowed to give to the program. (not tcl?)
+To set up a REPL, a list of expressions that the user is allowed to give to the program is defined as in Table \ref{REPL Commands}.
+
 \begin{table}[H]
   \centering
   \begin{tabular}{|>{\ttfamily}p{11em}|p{\dimexpr\textwidth-18em}|}
@@ -50,4 +49,5 @@ To set up a REPL, we need to define a list of expressions that the user is allow
     \hline
   \end{tabular}
   \caption{Commands accepted in test REPL}
+  \label{REPL Commands}
 \end{table}
