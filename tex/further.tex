@@ -1,27 +1,64 @@
 \chapter{Further Work}
 
-\section{Verilog Preprocessor}
+\section{Unified User Interface}
+\subsection{Expanded Software Design}
+A major point of feedback obtained during the OOTB test is that the set up process of the testbench is tedious and error-prone.
+To counter this, we can give more responsibility to the software.
+Since Qsys and Quartus both provide binary executable files for running in command line without GUIs, the hardware configuration process can be entirely scripted and packaged within the testing software.
+
+The software can first ask the user for values all the hardware configuration variables such as \texttt{WIDTH} and \texttt{NUM\_SUB\_MON}.
+With these values, the software can edit the \texttt{.qsys} system file to make the connections and adjust the parameters.
+\texttt{.qsys} files are written in standard XML, which has ample support in Python, so parsing and editing a small part of it should be feasible with some effort.
+
+Then the software can call Qsys to generate the synthesisable RTLs, which can be compiled with another call to Quartus.
+Establishing a connection to the development board should be possible in software as well.
+In the environment of the current implementation, the development board is connected with ssh, and files are uploaded with rsync.
+Programming the FPGA is done with a shell script ran on the HPS, so the entire configuration process can be automated with software.
+From the perspective of a user, they would have done everything in a single piece of software, saving the confusion and trouble in the current set up.
 
 \subsection{Additional Customisation}
-\begin{enumerate}
-  \item LFSR with variable width
-  \item variable number of inputs/outputs to DUT
-\end{enumerate}
+As stated during evaluation, there exist a number of parameters that should be configurable in the testbench implementation.
+The testbench should not be arbitrarily limited by a width of 32, or a maximum number of input ports of 2.
+To fix this, we have to write highly parametrised code.
+However, writing this kind of code in pure Verilog can get cumbersome fast with its generate loops.
 
-\subsection{Unified Interface}
-\begin{enumerate}
-  \item Qsys
-  \item Quartus
-  \item Software
-\end{enumerate}
+These loops does not support changing the names of register in different iterations, which forces the use of multi-dimensional arrays of registers.
+They are simple enough to access if we only need to access them in one direction.
+For example, getting the second register in the array is simple, but if we want to do an operation to the bit 2 of every register in the array, the code gets complex and even worse if there are more than 2 dimensions.
+However, each new configurable parameter introduces at least a new dimension in the design, which makes the code unwieldy.
+This also makes verifying the code with simulation difficult, since nested generate loops and register arrays always appear together in one direction, quickly clustering up the limited space for waveforms.
+Preprocessing with macro syntaxes such as ticks and double ticks may work on one simulator but not the other, and could cause trouble in synthesis as well.
+This is not great for usability as portability and wide support is of great importance to this project.
 
+Since we would already have a software doing all the hardware configuration at this point, we propose writing a small script that generates the Verilog files for synthesis as a part of the software.
+This means once generated, everything becomes flattened Verilog code, and easy to handle.
+This preprocessor does not have to be very powerful, it just needs to unroll for loops with variable number of iterations.
+All loop sizes will be provided by the user before flattening, so it should not be too difficult.
+
+Once completed, this would make the process of adding new configurable parameters much easier for both developers and users.
+Developers will have an easier time writing RTL and verifying them in simulation, and the user can just enter any additional parameters into the same piece of software with the same interface as before.
+
+\section{Software Test Statistics}
+
+Another limitation for the current testbench is for how it processes the test results.
+Since there is no implemented way of transferring results at-speed from the FPGA to the HPS, the precision data collected in the scoreboard module has to be turned into two registers, \texttt{maxacc} and \texttt{minacc} for the HPS to read.
+This is a great waste of potential as the HPS can be much better at processing the precision data and providing them in an insightful manner to the user.
+The precision of a 32-bit number can be one of 33 values, so it can be conveyed in 6 bits without additional compression.
+They would still fill up any on chip memory fast.
+At 400MHz, it still fills up 300MB of space in a second even if we assume data alignment is not an issue.
+
+There are two possible solutions here.
+On one hand we could send as much as possible through the standard HPS-FPGA bridge and drop the rest and hope that it would not affect the overall statistics.
+On another we could save them up on the 1GB RAM since it is rated at 3.2GB/s.
+Then we can test in bursts so that the RAM has time to send out its stored data.
+
+As expected, a trade off is necessary.
+Therefore as planned in the interim report, we also need to have a switch that turns verbose statistics on or off.
 
 \section{Automatic Delay Reconfiguration}
-
-Since finding out the delay of the DUT is useful for further simplifying the configuration process of the framework, a delay tester is built within the driver.
-It counts the number of cycles for the DUT to produce its output as \texttt{dut\_delay}, but it still has a few limitations in its design.
-As such, using this to reconfigure the driver to monitor delay on the fly is not yet possible.
-How this might be achieved will be discussed in the Further Work chapter of this report.
+One of the value the user needs to specify before compiling the hardware is the output delay of the DUT in number of clock cycles.
+Since having one less thing the user has to specify is one step towards a more convenient system, a delay tester is built to test the idea of on-the-fly reconfiguration of expected DUT delay in the driver.
+It counts the number of cycles for the DUT to produce its output as \texttt{dut\_delay}, but there are a few limitations in its design, so the logic of dynamically configuring the driver with \texttt{dut\_delay} was not complete.
 
 The delay tester is built with a simple FSM.
 
@@ -56,12 +93,7 @@ With a 3-bit counter as shown in the timing diagram, it can measure this delay f
 Longer delays can be measured by extending the width of \texttt{out\_count}.
 
 
-without:
-394.01MHz
-with delay tester:
-Fmax, Restricted Fmax
-374.25, 315.06
-slow 1100mV 85C
+The addition of this function has slowed down the testbench's $f_\text{max}$ to 315.06MHz.
 
 \subsection{Reference Delay}
 Currently reference is sub-monitor -> which needs to pass through dut\_out as well.

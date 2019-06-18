@@ -36,6 +36,7 @@ This can be measured by the number of configurable parameters that it has, and t
     \texttt{WIDTH}        & $\le$32 bits & Design I/O width \\
     \texttt{NUM\_SUB\_MON}& $\ge$2       & Varies time constraint ratio between DUT and reference \\
     $f_{\text{dut}}$             & $\le$400MHz  & Frequency of the DUT \\
+    DUT delay             & All values & The input to output delay of the DUT \\
     bitset/bitclr         & All values & Forces bits in test data in auto mode \\
     manual                & All values & Sets test data in manual mode \\
     time                  & All values & Sets test duration \\
@@ -57,11 +58,11 @@ While the testbench implementation already allows for a great variety of DUTs to
   \item The DUT can only have 1 or 2 inputs and 1 output.
   \item The FPGA has no way of transferring all \texttt{diff} data out to the HPS at-speed.
   \item The testbench was built with a 32 bits maximum width in mind.
-        This is reflected on how the LFSRs in the randomiser have 32 bits, and how the \texttt{CLZ} operation in scoreboard is implemented with a lookup table.
+        This is reflected on how the LFSRs in the randomiser have 32 bits, how the \texttt{CLZ} operation in scoreboard is implemented with a lookup table, and how we chose the light-weight AXI Bridge, which has a fixed width at 32 bits~\cite{Altera6}.
 \end{enumerate}
 
 Looking at the lists, we can conclude that the product is reasonably flexible, but more importantly, as a prototype, the implementation has demonstrated the flexibility and the extensibility of the framework design.
-How we might loosen these limitations and exploit more of the potential from the framework design will be discussed in the Further Work section of this report.
+How we might loosen these limitations and exploit more of the potential from the framework design will be discussed in the \textit{Further Work} chapter.
 
 \subsection{User-friendliness}
 The ease of use of the testbench can be another evaluation point.
@@ -93,10 +94,10 @@ Instead of taking one and a half weeks as planned, it took more than a month to 
 The details and the resolution of the problem were discussed in section 10.1.2 and 10.1.2.
 
 Since we have planned in slacks for each task, this delay did not hit the project as hard as it could have without.
-The next task of \textit{Handling Failures} was cut short, so while the basics features such as providing accuracies of failed outputs and statistical data was built, the added reconfigurability for the verbosity of the statistics was not made available so the output of the testbench is always the same.
+The next task, \textit{Handling Failures} was cut short, so while the basics features such as providing accuracies of failed outputs and statistical data was built, the added reconfigurability for the verbosity of the statistics was not made available so the output of the testbench is always the same.
 The initial reasoning for providing varying verbosity was that we were worried that additional logic would slow down the system, so the user will have the choice between having faster tests or having more detailed results.
 As we have limited the maximum width of the implementation at 32, the additional logic was built with lookup tables and other components that did not slow down the system as much.
-The final task of \textit{Interactive UI} was fully complete as an interactive command line interface was built.
+The final task, \textit{Interactive UI} was fully complete as an interactive command line interface was built.
 In addition, it also had automation capabilities with macro files, which was a feature beyond what was planned for this task in the previous report.
 
 As stated in the interim report section 6.2.2, there will always be more potential for further work.
