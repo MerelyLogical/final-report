@@ -1,57 +1,104 @@
 \chapter{Evaluation}
 
 \section{Product Metrics}
-
 \subsection{Robustness}
-The next few measures looks at the performance of the final product.
+As planned in the interim report, we will use 3 metrics to evaluate the performance of the final product.
 First, the maximum stress of which the testbench can provide without failing is a good metric.
 This can be quantitatively measured by the maximum data throughput across the DUT, and the maximum frequency that the DUT can be running where the testbench remains reliable.
 A robust testbench with a higher maximum frequency can reveal a wider picture in the performance of the DUT.
 This would hopefully allow more insights to be gained regarding the DUT, or it could mean that the testbench can be used for future designs that may be faster than the current one.
-As the main quantitative metric, this will be a vital indicator of the project's success.
+
+To measure this, we can run \textit{TimeQuest} on the compiled design to obtain software estimations of the speed of the design.
+The worst case scenario is a 1100mV model running at 85$^\circ$C.
+Under this condition, the restricted $f_{max}$ is reported as 394.01MHz.
+However, software estimations are usually conservative, so hardware tests were run to complement the results.
+After compiling the design on to a FPGA, it was observed that the test was reasonably stable at 400MHz, but breaks frequently at 425MHz.
+
+Although this did not reach the initial goal of 600MHz set in the design phase of the project, it is still high enough to be capable of testing a wide range of designs.
+This number can be further optimised by pipelining the slowest signal paths and reducing the latency in each cycle.
+The initial $f_{max}$ estimation before the frequency optimisation was at 210MHz.
+Because it is a relatively time consuming task with diminishing returns, and does not provide any functional improvement to the implementation, it was dropped for more important work once the milestone of 400MHz was reached.
+
+Overall this is still a satisfactory result, as the frequency still comfortably higher than that of the arithmetic unit, which was assumed to run at 300MHz.
+Just to compare the hardware acceleration, we timed a software simulation of the same testbench.
+It managed to process 42000 data points in a second, which is equivalent to 42kHz, making the FPGA roughly 10000 times faster than software.
 
 \subsection{Flexibility}
-%This is where to discuess current functional limitations of the product.
-The flexibility of the testbench is also vital to the product's performance.
-The testbench should suitable for a range of DUTs.
-This will allow the testbench to be used for future experiments.
-The flexibility can be measured by the number of configurable parameters that it has, and the range of which these parameters can be adjusted to.
+As the framework is designed to be extensible and widely applicable, the flexibility of the testbench is also vital to the product's performance.
+This can be measured by the number of configurable parameters that it has, and the range of which these parameters can be adjusted to.
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{|l|c|p{15em}|}
+    \hline
+    Item                  & Reconfigurability & Explanation \\
+    \hline
+    \texttt{WIDTH}        & $\le$32 bits & Design I/O width \\
+    \texttt{NUM\_SUB\_MON}& $\ge$2       & Varies time constraint ratio between DUT and reference \\
+    $f_{\text{dut}}$             & $\le$400MHz  & Frequency of the DUT \\
+    bitset/bitclr         & All values & Forces bits in test data in auto mode \\
+    manual                & All values & Sets test data in manual mode \\
+    time                  & All values & Sets test duration \\
+    design I/O            & 2 in 1 out & Number of inputs and outputs supported for design \\
+    \hline
+  \end{tabular}
+  \caption{Configurable and Fixed Options}
+  \label{ProdOpt}
+\end{table}
+
+Most of these items have been discussed in detail in the previous chapters.
+The entry on test duration shows that the test data generation and transfer system design removes the upper limit in how long the test can continuously run.
+This is useful if the user is interested in stressing the FPGA at a high temperature.
+
+While the testbench implementation already allows for a great variety of DUTs to be tested, there are still featural limitations that may become deal breakers for some users.
+\begin{enumerate}
+  \setlength\itemsep{0pt}
+  \item The driver filtering in auto mode is limited to bit-wise manipulation.
+  \item The DUT can only have 1 or 2 inputs and 1 output.
+  \item The FPGA has no way of transferring all \texttt{diff} data out to the HPS at-speed.
+  \item The testbench was built with a 32 bits maximum width in mind.
+        This is reflected on how the LFSRs in the randomiser have 32 bits, and how the \texttt{CLZ} operation in scoreboard is implemented with a lookup table.
+\end{enumerate}
+
+Looking at the lists, we can conclude that the product is reasonably flexible, but more importantly, as a prototype, the implementation has demonstrated the flexibility and the extensibility of the framework design.
+How we might loosen these limitations and exploit more of the potential from the framework design will be discussed in the Further Work section of this report.
 
 \subsection{User-friendliness}
 The ease of use of the testbench can be another evaluation point.
-On the hardware side, the verification system can be packaged into a Qsys module.
-Given the DUT is also a module with an agreed interface, it can easily be connected in Qsys for testing.
-On the software side, a user-friendly interface could be built.
-A usable command line interface may be good enough, but a simple graphic interface could make the tests much more visual and informative.
+Having a plethora of knobs and switches makes a powerful testbench, but no one would want to use the testbench if the effort to understand and start working with it is overwhelming.
+As such the framework also needs to be critiqued for its user-friendliness.
 
-The interface could also provide information on the failure in the DUT.
-A better testbench will provide more insightful details when the DUT fails.
-This would make debugging or evaluating the design much simpler.
-Along with the GUI, this project has many optional extensions that would be discussed further in section 6.2.
-After the main goal of the project being met, the number of optional functions implemented becomes a good measure of the progress of the project.
+The product has been designed and built with the users in mind every step of the way, and the usability has been studied with the OOTB test in the Testing chapter.
+In hardware, we have exposed the DUT and the reference conduits from the test wrapper to allow easy swapping of different test designs with Qsys.
+All configurable parameters are made editable from the same interface of Qsys.
+In software, the REPL is built so that the users can interact intuitively with the FPGA.
+We have also created a debug mode for the users since we understand that debugging hardware can be a convoluted process, and presenting insightful information to the users can be greatly beneficial.
 
-\subsection{Note}
-A noteworthy point in evaluation is regarding the progress of the sister project.
-The purpose of the testbench is to verify and stress arithmetic designs.
-If these designs are not available near the end of this project, it would be difficult to empirically prove the capabilities of the testbench and its surrounding system.
-Since the project comprises a verification system, the results from the benchmarks should not be used for evaluation of this project.
-It is not impossible, as there are still substitutes for them.
-For functional purposes, standard off-the-shelf arithmetic modules could be used in-lieu.
-For other purposes, it is possible to have a model done before the actual design starts in the paired project.
-While this would allow this project to progress, it would be extra work for the other project.
-In all, it would be nice to have a solid arithmetic module completely to run in this testbench, but without one, the system can still be built and completed, albeit generating less useful data towards the overall aim of the project.
+From the design perspective, the framework is modular with each module having one obvious main purpose.
+This means the expert users can easily modify the implementation if additional functionalities are desired.
+This is the same for both hardware and software.
 
-
+Nevertheless, the product still has potential to serve the users better.
+The users are still required to use Qsys and Quartus to enter a few parameters and make a few connections before compiling the hardware.
+They are then tasked to upload the test software and program the FPGA, before being able to start running tests with the REPL or macro files.
+In all, they have to perform inputs in 4 different locations, and as shown during the OOTB test, if a mistake made early in the process may not surface until the very end.
 
 \section{Project Metrics}
-\subsection{Implementation Plan}
-One natural way of measuring the success of the project is to look at the actual progress and compare it to the implementation plan.
-It should be noted that no plan is perfect, so some deviation is allowed.
-However, if there is significant delay from the plan, there must be justifications given.
+Aside from evaluating the product itself, we should also have a brief analysis at the project level.
+We first examine at the project plan proposed in the interim report.
+8 tasks were laid out onto a timeline in section 5.1.
+2 were already complete by the submission of interim report, leaving 3 core tasks and 3 extension tasks to do until the submission of this report.
+The 3 core tasks were done on time, but there was a major delay during the first extension task, which was titled \textit{Configurable Modules}.
+Instead of taking one and a half weeks as planned, it took more than a month to complete.
+The details and the resolution of the problem were discussed in section 10.1.2 and 10.1.2.
 
-\subsection{Fallbacks and Extensions}
-The fallbacks and extensions were detailed in the implementation plan.
-The progression of these extension tasks can be used as a point of evaluation to the project.
-This is already reflected in the product metrics, as 6.1.2 and 6.1.3 examines mainly the success of the extension tasks, while only 6.1.1 analyses the achievements of the core task.
-However, this does not mean that this project will be completely sealed if all extension tasks are complete before the final deadline, there is always more potential for future work.
-In the very unlikely case that the project progresses to such a state, new ideas such as dynamic voltage scaling will be drafted and evaluated.
+Since we have planned in slacks for each task, this delay did not hit the project as hard as it could have without.
+The next task of \textit{Handling Failures} was cut short, so while the basics features such as providing accuracies of failed outputs and statistical data was built, the added reconfigurability for the verbosity of the statistics was not made available so the output of the testbench is always the same.
+The initial reasoning for providing varying verbosity was that we were worried that additional logic would slow down the system, so the user will have the choice between having faster tests or having more detailed results.
+As we have limited the maximum width of the implementation at 32, the additional logic was built with lookup tables and other components that did not slow down the system as much.
+The final task of \textit{Interactive UI} was fully complete as an interactive command line interface was built.
+In addition, it also had automation capabilities with macro files, which was a feature beyond what was planned for this task in the previous report.
+
+As stated in the interim report section 6.2.2, there will always be more potential for further work.
+The list of limitations and potential improvements of the product was thus within expectation, and should not be considered as a failure on the project level.
+Therefore, we can claim that the project was reasonably successful on both the management and the execution level.

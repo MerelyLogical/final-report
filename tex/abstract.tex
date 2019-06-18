@@ -1,7 +1,7 @@
 % An Extensible Framework for At-speed Evaluation of Arithmetic Hardware
 
 \begin{abstract}
-In this project, we aim to provide an customisable evaluation framework for arithmetic hardware.
+In this project, we aim to provide a customisable evaluation framework for arithmetic hardware.
 Initially, the project is conceived to perform at-speed testing of a set of newly designed high-radix online arithmetic units.
 The key benefits of this exotic configuration are its high throughput and ability to fail gracefully.
 As such, the testbench is designed to have a high maximum bandwidth and a method of monitoring the precision of the errors.
@@ -9,5 +9,6 @@ However, we soon realised that in general, researchers would build their own ad-
 To improve the efficiency of their research and developments, we propose a flexible evaluation system for arithmetic units with this project.
 The framework includes both the testing software and the hardware architecture to minimise work for the user.
 Using a Cyclone V SoC development board, the system is implemented to demonstrate that it is indeed easy to setup and use, and can be modified to accommodate a variety of testing situations.
+Performance-wise, the implementation is stable at 400MHz on FPGA, resulting in a $4$ orders of magnitude acceleration compared to testing by software simulation.
 
 \end{abstract}
