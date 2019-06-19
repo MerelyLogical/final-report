@@ -5,7 +5,7 @@ Consequently, these online arithmetic operators are attractive for hardware impl
 When computing digits serially, they can be chained such that subsequent operations begin before the preceding ones complete.
 Parallel implementations tend to be most sensitive to failure in their LSDs, making them more friendly to overclocking than their LSD first counterparts, for which the opposite is true.
 In the past, online operators have typically been implemented in binary.
-Although Radix-2 modules are the simplest to design and has the shortest cycle time per digit, it has the highest online delay and requires the largest number of cycles to complete calculations~\cite{Tenca1}.
+Although Radix-2 modules are the simplest to design and have the shortest cycle time per digit, they have the highest online delay and require the largest number of cycles to complete calculations~\cite{Tenca1}.
 As such, the choice of binary is not absolute.
 
 The initial goal of this project is thus to build a testbench that can investigate the operators' suitability for FPGA implementation and examine the resultant tradeoffs between performance, area and power.
@@ -13,10 +13,9 @@ However, after some time researching and working on the project, we realised tha
 This makes the project much more meaningful in the long term, as researchers working on other arithmetic units can also utilise this testbench after some configuration.
 The focus of the project thus shifted to delivering a customisable and extensible verification system while retaining the at-speed testing capabilities needed for the starting goal.
 
-\textcolor{red}{Maybe include chapter numbers.}
 In this report, we will first discuss the motivations of investigating high-radix online arithmetic hardware on FPGAs.
 Following which the design of the evaluation framework will be put forth, and the design process of each individual module will be examined in detail.
-After determining the preferred designs, we will present how each module were built on a FPGA development board.
+After determining the preferred designs, we will present how each module was built on the FPGA development board.
 With the implementation complete, the framework itself needs to be evaluated to see if it fulfilled its purposes.
 This is done with an out-of-the-box testing, where a volunteer unfamiliar with this framework is tasked to evaluate provided designs, to see if the framework is as user-friendly and customisable as we designed it to be.
-The results of this test will be subsequently analysed, and the report will conclude after proposing a few ideas on further improving the product.
+The results of this test will be subsequently analysed, and the report will conclude after proposing a few ideas for further improvement of the product.

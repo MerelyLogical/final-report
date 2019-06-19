@@ -41,22 +41,23 @@ Developers will have an easier time writing RTL and verifying them in simulation
 \section{Software Test Statistics}
 
 Another limitation for the current testbench is for how it processes the test results.
-Since there is no implemented way of transferring results at-speed from the FPGA to the HPS, the precision data collected in the scoreboard module has to be turned into two registers, \texttt{maxacc} and \texttt{minacc} for the HPS to read.
+Since there is no implemented way of transferring results at-speed from the FPGA to the HPS, the precision data collected in the scoreboard module had to be turned into two registers, \texttt{maxacc} and \texttt{minacc} for the HPS to read.
 This is a great waste of potential as the HPS can be much better at processing the precision data and providing them in an insightful manner to the user.
 The precision of a 32-bit number can be one of 33 values, so it can be conveyed in 6 bits without additional compression.
 They would still fill up any on chip memory fast.
-At 400MHz, it still fills up 300MB of space in a second even if we assume data alignment is not an issue.
+At 400MHz, it still fills up 300MB of space in a second even if we assume byte alignment is not an issue.
 
 There are two possible solutions here.
 On one hand we could send as much as possible through the standard HPS-FPGA bridge and drop the rest and hope that it would not affect the overall statistics.
 On another we could save them up on the 1GB RAM since it is rated at 3.2GB/s.
 Then we can test in bursts so that the RAM has time to send out its stored data.
 
-As expected, a trade off is necessary.
+Either way, a trade off is necessary as expected.
 Therefore as planned in the interim report, we also need to have a switch that turns verbose statistics on or off.
 
 \section{Automatic Delay Reconfiguration}
-One of the value the user needs to specify before compiling the hardware is the output delay of the DUT in number of clock cycles.
+\subsection{Delay Tester}
+One of the many parameter values users need to specify, before compiling the hardware, is the output delay of the DUT in number of clock cycles.
 Since having one less thing the user has to specify is one step towards a more convenient system, a delay tester is built to test the idea of on-the-fly reconfiguration of expected DUT delay in the driver.
 It counts the number of cycles for the DUT to produce its output as \texttt{dut\_delay}, but there are a few limitations in its design, so the logic of dynamically configuring the driver with \texttt{dut\_delay} was not complete.
 
@@ -71,7 +72,8 @@ The delay tester is built with a simple FSM.
 
 We first start a counter called \texttt{out\_count}.
 Whenever this reaches all 1's, the driver output is set to some value with a known safe DUT output.
-In this example, the safe output value is 0, which means when the delay tester is active, no other output from the driver can result in a DUT output of 0.
+In this example, the safe output value is 0, which means when the delay tester is active, the driver will not generate any input to the DUT that will result in 0 on \texttt{dut\_out}.
+The delay tester can then test the DUT delay with this safe value, since it knows when the DUT received the safe input, and can count the number of cycles until the DUT gives the safe output.
 
 \begin{figure}[H]
   \centering
@@ -92,9 +94,12 @@ When the FSM enters the DONE state, we the value of the delay counter is the del
 With a 3-bit counter as shown in the timing diagram, it can measure this delay for up to 8 clock cycles.
 Longer delays can be measured by extending the width of \texttt{out\_count}.
 
+\subsection{Limitations}
+First, there has to be a safe value for the delay tester to use.
+For adders and multipliers, this is relatively simple as LFSRs cannot generate zero as inputs and the output can only be zero if the both or one input is zero, respectively.
+This is possible with subtracters as well since the two LFSRs will not produce the same number at the same time if they were seeded differently.
+However, as soon as the ALU starts dealing with overflows, IEEE floating numbers, or any non-standard number representation system, there would be no guaranteed safe value without user input.
+If the user have to input safe values for the delay tester to use, then if defeats the  purpose of saving one parameter for the user to configure.
 
-The addition of this function has slowed down the testbench's $f_\text{max}$ to 315.06MHz.
-
-\subsection{Reference Delay}
-Currently reference is sub-monitor -> which needs to pass through dut\_out as well.
-To have a pure module, need this delay control.
+The addition of this function also slowed down the $f_\text{max}$ to 315.06MHz.
+As such, the idea of having an on-the-fly delay reconfiguration system was put on hold, as it might not be worth the engineering effort to save the user one single input.
