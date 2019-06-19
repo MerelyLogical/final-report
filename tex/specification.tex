@@ -13,12 +13,12 @@ As such, most testbenches are not designed to be scalable or portable, serving o
 With this, the aim of the project was shifted to become more of a extensible framework to test arithmetic units, from a single-purpose specialised testbench.
 However, the framework must still retain the features requires to test the original online designs.
 The characteristic for online arithmetic units, as discussed in the last chapter, is that they can be fast, and most interestingly they fail gracefully with overclocking.
-Therefore, the goal of the project is now to design a evaluation framework with the following requirements.
+Therefore, the goal of the project is now to design an evaluation framework with the following requirements.
 
 \begin{itemize}
   \setlength\itemsep{0pt}
   \item It should be capable of testing at speed, which means that it can stress test the design a high maximum frequency.
-        Since the process in which a online arithmetic unit degrades as the clock frequency increases, this number must also be controllable during testing.
+        Since the process in which an online arithmetic unit degrades as the clock frequency increases, this number must also be controllable during testing.
   \item It should be able to provide information regarding the precision of the DUT output.
   \item It should be flexible, so that it can be customised to test different arithmetic hardware;
   \item It should be user-friendly, so the testbench can be adapted by many users to exploit the flexibility of the framework.

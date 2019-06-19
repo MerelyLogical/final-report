@@ -26,7 +26,7 @@ Firstly, the process of filling up the memory takes time.
 Thus, the testing would be broken up into bursts, with time in between for checking results and filling in new data.
 The complexity of the SDRAM interface also requires an SDRAM controller to be used to manage SDRAM refresh cycles, address multiplexing and interface timing.
 These all add up to significant access latency.
-While it could be overcome with burst and piplined accesses, it would further complicate the SDRAM controller.
+While it could be overcome with burst and pipelined accesses, it would further complicate the SDRAM controller.
 A controller is provided by Intel~\cite{Altera3}, but it would consume a non-negligible amount of the limited FPGA resources while adding unnecessary complexities to the design.
 Customising or building a new SDRAM controller to fit this project is possible, but needlessly time-consuming.
 
@@ -35,7 +35,7 @@ The on-chip memory is much faster and simpler to use.
 In comparison, this memory is implemented on the FPGA itself, and thus needs no external connections for accesses.
 It has higher throughput and lower latency than the SDRAM.
 The target board has 768.9kB of on-chip memory.
-With the maximum operating frequency at 315MHz, and the memory transactions can be piplined, so we have one transaction per clock cycle.
+With the maximum operating frequency at 315MHz, and the memory transactions can be pipelined, so we have one transaction per clock cycle.
 Therefore we can get an estimated bandwidth of 242Gbps~\cite{Intel4}.
 With an on-chip FIFO accessed in dual-port mode, the write operations at one end and the read operations at the other end can happen simultaneously.
 This feature is useful as tests are prepared and fed into the DUT, or when test results are collected and fed to the monitor.
@@ -109,7 +109,7 @@ By examining the two configurations, we can see that Fibonacci LFSRs have to XOR
 On the other hand, Galois LFSRs have multiple 2-input XOR gates working independently.
 On an FPGA, the cascade of gates is usually implemented with a LUT, so while using LUTs with only 2 open inputs might give some minor improvements over LUTs with 3 or 4 inputs, this increased delay of the Fibonacci configuration will not be significant.
 
-In terms of implementation, Fibonnaci LFSRs are slightly easier to code if width configurability is desired.
+In terms of implementation, Fibonacci LFSRs are slightly easier to code if width reconfigurability is desired.
 However, building a configurable Galois LFSR is only slightly more complex.
 
 As such, we need to take a step back and examine the overall structure of the randomiser to help us make this decision.
@@ -199,7 +199,7 @@ Due to the limitations of the bridge, the DUT cannot be fully saturated with the
 As such, each manual test input will be repeatedly sent to the DUT before the next one becomes available.
 The scoreboard will be frozen for all repeated inputs since in the subsequent inputs the DUT will have additional time to stabilise its output.
 
-\subsection{Synchronised Monitor Inputs}
+\subsection{Synchronised Inputs to Monitor}
 In addition to controlling what gets sent to the DUT, the driver has the responsibility to ensure that the monitor receives the test output from the DUT and the test inputs from the driver at the same time.
 After going through the filtering logic, the stream of test inputs will not only be sent to the DUT, but also sent to a shift register before reaching the monitor.
 The shift register will provide the delay required for the DUT to finish its operations.
@@ -207,86 +207,59 @@ Since the number of cycle delays from input to output should be consistent and k
 
 
 \section{Monitor}
+Another concern in the system design is of the different clock domains that must exist in the testbench.
+The purpose of the reference design is to be correct, so the timing requirements should be relaxed.
+This would hopefully make the reference relatively easy to produce and difficult to make mistakes on.
+Thus, it is not sensible to require the reference design to run as fast as the DUT, but they need to process the same data as the monitor needs to know if the DUT outputs are correct.
+Therefore, there needs to be a way in the monitor to allow the reference design to keep up with the DUT.
+Since the rest of the testbench needs to carry the DUT data and is does not have much complex logic, it is convenient to clock everything at the DUT, and have a slow domain that surrounds the reference design.
 
-Another concern in the system design is of the different clock domains that must exist on the FPGA.
-Since it is not sensible to require the reference design to run as fast as the DUT, there needs to be two clock domains in the system.
-The initial idea is to have one domain surrounds the DUT and another that supports the rest of the control logic around the DUT.
-These clock frequencies can be generated with PLLs, which are provided as IP Cores in the Quartus software~\cite{Altera4}.
-A clock tree will distribute them to the individual modules.
-Data crossing clock domains will be fed through FIFOs to prevent loss.
-
-The proposed structure will have the bulk of the control logic running in a separate clock domain to the DUT.
-Only an interface with FIFOs will be running in synchronicity with the DUT.
-Therefore, the test controls can run at a slower frequency without bottlenecking the system, allowing the DUT to be stressed further.
-The problem now is to ensure the monitor can handle the stream of DUT output coming in at a higher frequency that it is running at.
-As the monitor needs to calculate the correct data before it can check if the DUT output is correct, it cannot keep up with the speed of the DUT.
-This report consider three alternatives.
+We considered three possible solutions.
 
 \subsection{Partial Monitors}
-A lightweight idea is to implement a parity checker instead of a full model inside the monitors.
-For example, to check an adder, the monitor can just check if the final bit with a LUT acting as a XOR gate.
+A lightweight idea is to implement a partial checker instead of a full model inside the monitors.
+For example, to check an adder, the monitor can just ask the reference to add the lower few bits instead of the full input.
 
-Although this is reasonably fast, it cannot be extended once the DUT is faster than a parity calculation followed by a comparison.
-More critically, it provides no additional information once the DUT fails, and it has a 50\% rate of ignoring an error.
-If this is to be solved by increasing the number of bits checked, the problem returns back to its initial state.
-Thus this method will not be experimented.
+This should provide a reasonable speedup, but it has a critical flaw.
+If there are too many bits being checked in the reference, there will not be enough speedup for the reference to keep up with the DUT.
+If there are too little bits being checked, the monitor would have a large error rate, as it would not be able to know if the higher bits are correct or wrong.
+Therefore, this method will not be experimented.
 
 \subsection{Lazy Monitors}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=12cm]{img/LazMon}
+  \input{illu/lazy_mon}
   \caption{Structure of a Lazy Monitor}
   \label{LazMon}
 \end{figure}
 
-An more scalable alternative is to have the monitor only check a selection of data sets.
-For example, if the monitor is programmed to check every third test point, statistically it will make little difference to the final result.
-In case the DUT is aware of this and only produce correct outputs on every third operation, this process can be randomised too.
+A more scalable alternative is to have the monitor only check a selection of data sets.
+For example, if the monitor is programmed to check every third test point, statistically it will make little difference to the final result, but the reference now has three times the time to calculate the correct answer.
+In the unlikely case the DUT is aware of this and only produce correct outputs on every third operation, this process can be randomised too.
 
 This method can be extended if the DUT get fast simply by skipping more checks, and it has the full information when it detects an error.
 However, this method needs the extra logic in the random controller, making the monitor slightly more complex than it probably should be.
 
 \subsection{Parallel Monitors}
 
-\textcolor{red}{These diagrams needs to be rebuilt to better reflect the idea. Or maybe even rebuilt with the simplified clock domain thing but that could also be done in the implementation chapter.}
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=15cm]{img/ParMon}
+  \input{illu/parallel_mon}
   \caption{Structure of a Parallel Monitor}
   \label{ParMon}
 \end{figure}
 
-As the test data is uniform, the monitor can be parallelised in to a number of sub-monitors.
-The sub-monitors is connected to a distributor that is connected to three FIFOs.
-The FIFOs are the inputs and the output of the DUT.
-A round robin demultiplexer distributes the data to the sub-monitors equally.
-The results from each sub-monitor are then sent to a single scoreboard.
-To avoid potential hazards, the output from the sub-monitors will be buffered before processed by the scoreboard.
+As the test data is uniform, the monitor can be parallelised to make use of multiple instances of the reference design.
+These reference-containing sub-monitors are connected to a distributor.
+The distributor has logic that gives data to all references in a round-robin manner.
+The results from each sub-monitor are then collected back to the monitor and fed to a single scoreboard.
 
 This does not have data dependency on a random controller, and it can fully guarantee the correctness of the DUT.
-It is also scalable as more sub-monitors can be added it the DUT fills up its output buffer.
+It is also scalable as more sub-monitors can be added if the DUT gets faster compared to the reference design.
 As a downside, this method takes up the most FPGA resources to implement as it scales.
 
 Comparing across the three methods, the parallel monitors will be used for this project, as it offers the best functionalities.
-
-\section{Simplified Clock Domains}
-During the implementation of the parallel monitors, it is realised that picking the parallel structure has enabled a simpler way for us to realise the hardware design regarding clock domains.
-So far, the assumption has been that during frequency testing, the testbench would hold on to a consistent frequency, while the frequency of the DUT is varied.
-However, this causes unnecessary complications as the clock ticks of the two domains would shift in and out of phase during testing, which needs to be handled with extreme care since there is heavy data moving through the domains.
-
-Looking back at the overall structure of the framework, the slowest block is the reference designs in the sub-monitors.
-The priority of a reference design is to be functionally correct.
-Since the operation it carries out can still be complex, it should have a relaxed timing requirement in order to avoid additional burdens on the designer.
-This would hopefully make the reference relatively easy to produce and difficult to make mistakes on.
-On the other hand, the rest of the testbench should be able to operate at the speed of the DUT, as they are relatively light in terms of the logical operations that they perform.
-If a slow signal path arises in the system, it is also relatively harmless to sacrifice a few cycles in terms of latency to keep its maximum frequency high.
-
-Therefore, instead of having a fast domain surrounding the DUT, the new design would have a slow domain surrounding the sub-monitor, while the rest of the testbench is clock at the same speed as the DUT.
-The number of sub-monitors is a parametrised value, but it has to be an integer.
-As such, the slow domain will always have a clock frequency that is a factor of the frequency of the rest of the testbench.
-This way, they can stay in phase, which may have made the design of the monitor slightly more complicated, but vastly simplified the rest of the system.
 
 \section{Scoreboard}
 One of the simplifications has to do with the connection from the monitor to the scoreboard.

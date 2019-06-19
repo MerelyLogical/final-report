@@ -17,7 +17,7 @@ This allowed the reference design to be studied in detail, and the sections requ
 
 By examining Figure \ref{Golden Hierarchy}, the structure of the reference design, we see that it has a top-level wrapper called \texttt{sys\_top}, which instantiates the Qsys system \texttt{soc\_system} and a few IP blocks that handle the low-level hardware controls on the development board.
 This Qsys system is of the most interest to us as it contains the module \texttt{hps}.
-In \texttt{hps}, there are 3 ports named \texttt{h2f\_axi\_master}, \texttt{h2f\_axi\_slave}, and \texttt{h2f\_lw\_axi\_master}, cooresponding to the bridges exposed by the HPS for connections~\cite{Altera6}.
+In \texttt{hps}, there are 3 ports named \texttt{h2f\_axi\_master}, \texttt{h2f\_axi\_slave}, and \texttt{h2f\_lw\_axi\_master}, corresponding to the bridges exposed by the HPS for connections~\cite{Altera6}.
 
 With this knowledge, we can insert the testbench design into this hierarchy by having it wrapped into a Qsys module, with an open port that works as a slave to the AXI bridge.
 As the traffic passing through the HPS-FPGA bridge is minimal in our design, the lightweight bridge will be used for its simplicity.

@@ -32,9 +32,9 @@ Among other issues, my supervisor was able to identify a clock which I have hand
 After spending some time tidying up this clock, the system again behaved correctly as predicted by the simulation.
 
 \section{Maximum Frequency}
-As a important benchmark of the framework, the maximum frequency is closely monitored during the implementation process.
+As an important benchmark of the framework, the maximum frequency is closely monitored during the implementation process.
 This is done with \textit{TimeQuest Timing Analyser}, which is a tool that can provide an estimate on the maximum frequency the testbench and run safely on.
-If this value is lower than what is required, the tool can also provides a list of the slowest offending signal paths for us to optimise on.
+If this value is lower than what is required, the tool can also provide a list of the slowest offending signal paths for us to optimise on.
 
 During FPGA tests, the physical maximum frequency the board can achieve is measured with a script that will run the same test repeatedly with increasing frequencies.
 These are useful as the software estimations are usually more conservative than what is possible on hardware.

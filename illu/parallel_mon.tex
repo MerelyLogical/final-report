@@ -1,0 +1,27 @@
+\begin{tikzpicture}
+  [
+    x=1em, y=1em,
+    block/.style =
+      {draw, rectangle, align=center, minimum width=6em, minimum height=2em},
+    inter/.style =
+      {draw, rectangle, align=center, minimum width=16em, minimum height=1em}
+  ]
+  \node [block] at ( 0,4)  (d) {Driver};
+  \node [block] at ( 0,0)  (t) {DUT};
+  \node [block] at (10,4)  (m) {Monitor};
+  \node [block] at (10,0)  (u) {Distributor};
+  \node [block] at (20,4)  (s) {Scoreboard};
+  \node [block] at ( 2,-4)  (r1) {Reference};
+  \node [block] at (10,-4)  (r2) {Reference};
+  \node [block] at (18,-4)  (r3) {Reference};
+
+  \draw[ ->, >=stealth] (d.east)                 -- (m.west);
+  \draw[ ->, >=stealth] (d.south)                -- (t.north);
+  \draw[ ->, >=stealth] (t.east)            to[-|-] ($(m.west)-(0,0.5)$);
+  \draw[<->, >=stealth] (m.south)                -- (u.north);
+  \draw[ ->, >=stealth] (m.east)                 -- (s.west);
+  \draw[ ->, >=stealth] ($(u.south)-(0.5,0)$) to[|-|] (r1.north);
+  \draw[ ->, >=stealth] ($(u.south)+(0,0)$)   to[|-|] (r2.north);
+  \draw[ ->, >=stealth] ($(u.south)+(0.5,0)$) to[|-|] (r3.north);
+
+\end{tikzpicture}
