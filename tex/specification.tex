@@ -1,30 +1,25 @@
-\chapter{Project Specification}
+\chapter{Project Requirements}
 
-\section{Project Organisation}
-This project is a part of a larger project investigating the effect of using high-radix number representation with online arithmetic operators.
+This project started as a part of a larger project investigating the effect of using high-radix number representation with online arithmetic operators.
 The overarching aim involves implementing such a system on an FPGA and quantifying its performance improvements.
-This is achieved through two individual projects, vertically split from the enveloping project.
-One shall design the arithmetic operator modules, while the other shall design a system from the top-level to test and evaluate these operators.
-This project deals with the system-level issues.
+This is achieved through two individual projects split from the enveloping project.
+One shall design the arithmetic operator modules, while the other shall design a system to test and evaluate these operators.
+This project was thus conceived as the evaluation system.
 
-As this project progresses in parallel with the designing of the operator modules, it is necessary to decouple the two projects so that, being individual projects, they can be evaluated individually.
-The success of one project should not be restricted by the status of the other.
-To this end, the goal of the system-level design is more focussed on its functionalities and robustness.
-This relationship and its effect on the evaluation will be examined further in the evaluation chapter of this report.
+As the project progressed, we soon realised that the system does not have to be only for the specific online arithmetic units, and can be made into a customisable framework that can fit a variety of designs.
+While there have been many similar performance analyses done on hybrid SoCs before, each of them used their own, usually ad hoc, testbench design~\cite{Shi1}~\cite{Li1}.
+As such, most testbenches are not designed to be scalable or portable, serving only what they are built for.
 
-To ensure the two products will work together once they are both complete, a common interface is agreed upon.
-The interface will be done using Qsys.
-The unit-level project will build different operators, which can have varying arithmetic functions and designs.
-These can be packaged into individual Qsys modules, as adders, multipliers, or dividers.
-Alternatively they can also be delivered as a single module taking two operands and an instruction that is one of the four basic arithmetic operations.
-These will then become the DUTs of the testbench.
+With this, the aim of the project was shifted to become more of a extensible framework to test arithmetic units, from a single-purpose specialised testbench.
+However, the framework must still retain the features requires to test the original online designs.
+The characteristic for online arithmetic units, as discussed in the last chapter, is that they can be fast, and most interestingly they fail gracefully with overclocking.
+Therefore, the goal of the project is now to design a evaluation framework with the following requirements.
 
-\section{Deliverables}
-At the end of the project, the system should be able to perform the following:
-\begin{enumerate}
+\begin{itemize}
   \setlength\itemsep{0pt}
-  \item Connect to the arithmetic modules as its input;
-  \item Generate and run tests on these modules;
-  \item Vary the frequency of the FPGA;
-  \item Evaluate its performance.
-\end{enumerate}
+  \item It should be capable of testing at speed, which means that it can stress test the design a high maximum frequency.
+        Since the process in which a online arithmetic unit degrades as the clock frequency increases, this number must also be controllable during testing.
+  \item It should be able to provide information regarding the precision of the DUT output.
+  \item It should be flexible, so that it can be customised to test different arithmetic hardware;
+  \item It should be user-friendly, so the testbench can be adapted by many users to exploit the flexibility of the framework.
+\end{itemize}

@@ -10,7 +10,7 @@ Due to this inconsistency, arithmetic operators may be forced to compute word-by
 Therefore, if a divider follows an adder, the divider has to wait until the adder has completed its computation before it can begin its own.
 
 The other commonality of traditional designs is that their precisions are specified at design-time.
-Once built, a 32-bit adder always adds 32 bits together, adding 16-bit numbers usually involves masking the unused bits.
+Once built, a 32-bit adder always adds 32 bits together; adding 16-bit numbers usually involves masking the unused bits.
 A possible way of making it less inefficient would be using SIMD instructions~\cite{Duncan1}, splitting a large register into a few smaller ones, to execute the same instruction on them in parallel.
 This, however, has the tradeoff of being harder to program, and the applications must have sufficient parallelism to exploit.
 
@@ -25,8 +25,8 @@ Thus the output digit of an earlier operation can be fed into the next operator 
   \label{Online}
 \end{figure}
 
-As illustrated in figure~\ref{Online}, while each individual operation may take longer than its conventional counterpart, online arithmetic can provide a speedup if the operators are chained in serial.
-In addition to the tradeoff in time, individual online arithmetic operators also uses more memory.
+As illustrated in Figure~\ref{Online}, while each individual operation may take longer than its conventional counterpart, online arithmetic can provide a speedup if the operators are chained in serial.
+In addition to the tradeoff in time, individual online arithmetic operators also use more memory.
 To perform all computation from the MSD to the LSD, the use of a redundant number system is compulsory.
 However, this redundancy also has its advantage in making the operators scalable.
 The time required per digit can be made independent of the length of the operands~\cite{Trivedi1}.
@@ -45,27 +45,25 @@ This means the error of the operation would be small.
 With overclocking, online arithmetic operators fail gracefully, losing their precision gradually from the lowest bits first.
 Thus, it allows for a runtime tradeoff between precision and frequency~\cite{Shi2}.
 
-% REVISIT JD: find better arguments for high radix on FPGA for these two paras
 \section{High-radix Arithmetic}
 Conventional designs of arithmetic operators use binary representations.
 The additional concerns of high-radix operators did not provide justifiable improvements as clock speed of processors kept increasing.
 In recent years, the clock speed increase effectively ended, and semiconductor dies shrunk to extremely small sizes.
 This means the relative processing time available in a clock period increased.
 This enabled and drove the desire for accomplishing more per clock cycle, and high-radix arithmetic is one of them.
-It has been shown that, high-radix offers power saving and/or reasonable speedups to the arithmetic operations~\cite{Catanzaro1}\cite{Amin1}\cite{Chen1}.
+It has been shown that, high-radix offers power savings and/or reasonable speedups to the arithmetic operations~\cite{Catanzaro1}\cite{Amin1}\cite{Chen1}.
 
 However, the savings are not without trade-offs.
 If the radix chosen is not a power of 2, then this trade-off can become unfavourable if the specification requires much I/O and little computation.
-This is because overhead of radix conversion would be significant~\cite{Whyte1}.
+This is because the overhead of radix conversion would be significant~\cite{Whyte1}.
 It is also unwise to use high-radix representations when the numbers are unusually small, thus making the savings offered by the high-radices negligible~\cite{Catanzaro1}.
-The radix also cannot be too high, as the time in a clock period is still limited, if there is too many logic gates for the signal to propagate through, it might become the critical path and slow down the overall design.
+The radix also cannot be too high, as the time in a clock period is still limited.
+If there are too many logic gates for the signal to propagate through, it might become the critical path and slow down the overall design.
 
 The construct of FPGAs might make high-radices more attractive than it is on ICs.
-As FPGAs contain small fast carry-ripple adders, high-radix adders may be able to exploit them to obtain significant speedups~\cite{Kornerup1}.
+As most FPGAs contain small fast carry-ripple adders or hardened carry propagate logic, high-radix adders may be able to exploit them to obtain significant speedups~\cite{Kornerup1}.
 
 \section{Summary}
 Using high-radix number representations for online arithmetic is a relatively novel concept.
-While there has been some research with similar premises~\cite{Lynch1}\cite{Lynch2}, We take a more direct approach with this project by implementing custom operators made for high-radix online arithmetic on an FPGA.
+While there has been some research with similar premises~\cite{Lynch1}\cite{Lynch2}, there are sufficient motivation to implement custom operators made for high-radix online arithmetic on an FPGA.
 This will provide empirical results on the method, and will hopefully reveal practical insights along the way.
-
-Furthermore, benchmarking this exotic arithmetic system with popular FPGA applications such as neural networks would be interesting, as there is not much precedence for it.
