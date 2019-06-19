@@ -105,8 +105,8 @@ The highest bit is simply the previous lowest bit, and all other bits are obtain
 
 Other LFSR configurations such as Xorshift~\cite{Marsaglia1} exist, but they are mostly designed and optimised as pieces of software, thus being less appropriate for this design.
 
-By examining the two configurations, we can see that Fibonacci LFSRs have to XOR multiple bits together through a cascade of 2 input XOR gates, or a single XOR gate with multiple inputs.
-On the other hand, Galois LFSRs have multiple 2 input XOR gates working independently.
+By examining the two configurations, we can see that Fibonacci LFSRs have to XOR multiple bits together through a cascade of 2-input XOR gates, or a single XOR gate with multiple inputs.
+On the other hand, Galois LFSRs have multiple 2-input XOR gates working independently.
 On an FPGA, the cascade of gates is usually implemented with a LUT, so while using LUTs with only 2 open inputs might give some minor improvements over LUTs with 3 or 4 inputs, this increased delay of the Fibonacci configuration will not be significant.
 
 In terms of implementation, Fibonnaci LFSRs are slightly easier to code if width configurability is desired.

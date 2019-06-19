@@ -9,11 +9,11 @@
   \label{RandomiserBlk}
 \end{figure}
 
-Implementing the randomiser is straight forward.
+Implementing the randomiser is straightforward.
 A possible set of taps for a 32-bit Galois LFSR is [32, 30, 26, 25].
 Referring back at Figure~\ref{GalLFSR} on page~\pageref{GalLFSR},
-the logic is to XOR the bits left of the taps with bit 0, and simple right shift for all other bits.
-For driver to control the randomiser, an enable signal and an initial signal is added as input in addition to clock and reset.
+the logic is to XOR the bits left of the taps with bit 0, and simply right shift all other bits.
+For the driver to control the randomiser, an enable signal and an initial signal are added as input in addition to the clock and reset.
 The \texttt{initial} signal seeds the LFSR.
 
 \section{Driver}
@@ -26,12 +26,12 @@ The \texttt{initial} signal seeds the LFSR.
 \end{figure}
 
 The filter select signal \texttt{f\_select} selects the mode of operation of the driver.
-When it is set, the driver will read from \texttt{f\_manual} and feed them to the output.
-Otherwise, the driver will take the output of the randomisers at \texttt{rand\_*}, set and clearing specific bits according to \texttt{f\_bitset} and \texttt{f\_bitclr}.
+When it is set, the driver will read values from \texttt{f\_manual} and feed them to the output.
+Otherwise, the driver will take the output of the randomisers at \texttt{rand\_*}, setting and clearing specific bits according to \texttt{f\_bitset} and \texttt{f\_bitclr}.
 
 The output is immediately sent to the DUT from the ports \texttt{drive\_dut\_*}.
 The output is also delayed for a number of cycles before being sent to the monitor from the ports \texttt{drive\_mon\_*}.
-This delay is known and thus can be configured by the user before compiling the testbench.
+This delay is the cycle delay of the DUT, which is known and thus can be configured by the user before compiling the testbench.
 
 \begin{figure}[H]
   \centering
@@ -40,14 +40,14 @@ This delay is known and thus can be configured by the user before compiling the 
   \label{DriveWave}
 \end{figure}
 
-Figure \ref{DriveWave} shows how the waveform of the implemented driver looks like when operating in auto mode.
-It should be stated that all waveforms in this report has been obtained from simulation, and are verified to be correct.
-For clarity, unnecessary signals and signal values are omitted.
+Figure \ref{DriveWave} shows how the waveform of the implemented driver looks when operating in auto mode.
+It should be stated that all waveforms in this report have been obtained from simulation, and are verified to be correct.
+For clarity, unnecessary signals and signal values have been omitted.
 
-In the example waveform, we assume the design is a simple 1 input 1 output module where the input is passed to the output after 2 cycles.
-The driver passed \texttt{rand} to \texttt{drive\_dut} after a cycle.
-When \texttt{f\_bitclr} is \texttt{0xf000}, the top 4 bits of the output are set to 0, and when \texttt{f\_bitset} is \texttt{0x0004}, bit 2 of the output is set to 1.
-It should be noted, that if the same bit is set and cleared by the user, \texttt{f\_bitclr} takes priority.
+In the example waveform, we assume the design is a simple 1-input 1-output module where the input is passed to the output after 2 cycles.
+The driver passes \texttt{rand} to \texttt{drive\_dut} after a cycle.
+When \texttt{f\_bitclr} is \texttt{0xf000}, the top 4 bits of the output are set to 0, and, when \texttt{f\_bitset} is \texttt{0x0004}, bit 2 of the output is set to 1.
+It should be noted that, if the same bit is set and cleared by the user, \texttt{f\_bitclr} takes priority.
 This is an arbitrary choice, and is noted in the user guide.
 
 The driver delays the output to monitor by 2 cycles, and we can see that this aligns it the output from the DUT.
@@ -62,14 +62,14 @@ The driver delays the output to monitor by 2 cycles, and we can see that this al
 
 The monitor takes DUT inputs from the driver, and distributes them to a few sub-monitors.
 Each sub-monitor containing a reference design then produces the correct results \texttt{mon\_out} from the inputs with a relaxed time budget.
-The monitor then checks the difference between the reference output, \texttt{mon\_out}, and the DUT output, \texttt{dut\_out} with XOR gates.
-This results in \texttt{diff}, where each bit set to 1 indicates a wrong bit in the DUT output.
+The monitor then checks the difference between the reference output, \texttt{mon\_out}, and the DUT output, \texttt{dut\_out}, with XOR gates.
+This results in \texttt{diff}, where each bit set to 1 indicates an incorrect bit in the DUT output.
 \texttt{mon\_ready} will be set after the distributor has completed an entire round, where the first meaningful \texttt{diff} value becomes available.
 
 As the number of sub-monitors and the width of the tested unit are parametrised, the design of the distributor was not straightforward.
-An one-hot counter is set up to determined the currently active sub-monitor.
-Since the sub-monitors are clocked \texttt{NUM\_SUB\_MON} times slower, an array of \texttt{NUM\_SUB\_MON} registers each of size \texttt{WIDTH} is also created for each input or output of the design.
-These serves as the interface between the sub-monitors and the rest of the design.
+An one-hot counter is used to determine the currently active sub-monitor.
+Since the sub-monitors are clocked \texttt{NUM\_SUB\_MON} times more slowly than the DUT, an array of \texttt{NUM\_SUB\_MON} registers each of size \texttt{WIDTH} is also created for each input and output of the design.
+These serve as the interface between the sub-monitors and the rest of the design.
 
 \subsection{Sub-monitors}
 
@@ -81,10 +81,8 @@ These serves as the interface between the sub-monitors and the rest of the desig
 \end{figure}
 
 The current sub-monitor is a part of the monitor module in the architecture design that interfaces with the reference module.
-In addition to connecting with the reference inputs and outputs, the sub-monitors also handles the delay of the reference module.
-This is due to the highly parametrised nature of the monitor module, which made it rather complex and inflexible to the addition of more features.
-
-As such, there is an extra signal of \texttt{dtm\_out}, which has the same value as \texttt{dut\_out}, but delayed by the number of cycles that the reference design needs to complete its operation, thus aligning with \texttt{mon\_out}.
+In addition to connecting to the reference inputs and outputs, the sub-monitors also handle the delay of the reference module.
+To accomplish this, there is an extra signal, \texttt{dtm\_out}, which has the same value as \texttt{dut\_out}, but delayed by the number of cycles that the reference design needs to complete its operation, thus aligning with \texttt{mon\_out}.
 The other signals are directly connected to the reference module.
 
 \begin{figure}[H]
@@ -94,18 +92,18 @@ The other signals are directly connected to the reference module.
   \label{MonitorWave}
 \end{figure}
 
-Figure \ref{MonitorWave} shows the waveform of a monitor with \texttt{NUM\_SUB\_MON} as 3.
-The reference adder takes 1 cycle to complete, but it must be clocked at a frequency slower than that of the adder DUT.
+Figure \ref{MonitorWave} shows the waveform of a monitor with \texttt{NUM\_SUB\_MON} $=$ 3.
+The reference adder is a 1-cycle adder, but it must be clocked at a frequency slower than that of the DUT.
 With 3 sub-monitors, the width of \texttt{dist\_ctr} is 3, and its lowest bit corresponds to sub-monitor 0, which is shown in detail in this figure.
-\texttt{clk\_sub} is the clock driving the sub-monitor, which is made by masking the DUT clock with a delayed version of \texttt{dist\_ctr}.
-As it ticks, the I/O values are copied into the register arrays and held for 3 cycles.
+The sub-monitors are driven on the same \texttt{clk}, but it also has an \texttt{enable} signal that slows down the logic in the sub-monitor.
+As such, the I/O values are copied into the register arrays and held for 3 cycles.
 Within this time, the reference design completes its operation, fixing the value on \texttt{mon\_o}.
-When the cycle of \texttt{dist\_ctr} goes a full cycle and the \texttt{sub\_clk} ticks again, this value is collected back and XOR'ed to form the final output of the monitor, \texttt{diff}.
+When the cycle of \texttt{dist\_ctr} goes a full cycle and the \texttt{clk} ticks again with \texttt{enable} high, this value is collected back and XOR'ed to form the final output of the monitor, \texttt{diff}.
 In the example of Figure \ref{MonitorWave}, the second result was an error on the DUT, as it gave \texttt{0xa861} while the reference answer was \texttt{0xa864}.
-This means bit 0 and 2 were different, and \texttt{diff} is thus \texttt{0x0005}.
+This means that bits 0 and 2 were different, and \texttt{diff} is thus \texttt{0x0005}.
 
-The other sub-monitors all work identically but each 1 DUT cycle later the last.
-This allows the reference design to run slower than the DUT, to still provide a constant stream of \texttt{diff} at the monitor output as designed.
+The other sub-monitors all work identically but each 1 DUT cycle later than the last.
+This allows the reference design to run more slowly than the DUT, but still providing a constant stream of \texttt{diff} values at the monitor output, as designed.
 
 \section{Scoreboard}
 
@@ -116,22 +114,53 @@ This allows the reference design to run slower than the DUT, to still provide a 
   \label{ScoreboardBlk}
 \end{figure}
 
-This scoreboard tracks the number of valid test points going through with \texttt{data\_ctr} and the number of errors within them with \texttt{error\_ctr}.
+This scoreboard tracks the number of valid test points presented with \texttt{data\_ctr} and the number of errors within them with \texttt{error\_ctr}.
 The external input \texttt{freeze} is exposed to the software to stop all counting in the scoreboard.
-As the current HPS-FPGA bridge set up only allows sequential reads to the FPGA registers, it is necessary to ensure the values do not change within a single set of read commands from the software.
+As the current HPS-FPGA bridge setup only allows sequential reads to the FPGA registers, the freeze signal is necessary to ensure that the values do not change within a single set of read commands from the software.
 
-Another implication of the current bridge set up is that there is no simple way of getting all the \texttt{diff} values out to the HPS for statistics calculations.
-This is a limitation of the current implementation, and will be discussed in the Further work section of this report.
+Another implication of the current bridge setup is that there is no simple way of getting all of the \texttt{diff} values out to the HPS for statistics calculations.
+This limitation of the current implementation, and how it might be improved in the future will be discussed in the \textit{Further Work} chapter.
 Therefore, the hardware will have to do some simple statistics.
 
 Since we are interested in how the precision of the DUT degrades as the frequency increases, two signals are created to record the maximum and the minimum precision of the DUT output.
-Calculating the precision with the \texttt{diff} signal means counting the number of leading zeros (\texttt{CLZ}), as zeros indicate the correct bits.
-As the current implementation is limited with a maximum width of 32, the easiest way of doing \texttt{CLZ} fast is by padding zeros after the number to 32 bits, and then use a large lookup table with don't cares.
+Calculating the precision with the \texttt{diff} signal means counting the number of leading zeros (\texttt{CLZ}), as zeros indicate correct bits.
+
+As the current implementation is limited to a maximum width of 32, the easiest way of doing \texttt{CLZ} quickly is by padding zeros after the number to 32 bits, and then using a large lookup table with don't cares.
+Figure \ref{CLZVeri} shows how they may be done in Verilog for up to 8 bits.
 This precision signal is named \texttt{acc}.
 
-To keep track of the minimum precision, register \texttt{minacc} is first initialised to the maximum, and then for each smaller value observed, it will take on its smaller value.
+\begin{figure}[H]
+  \centering
+  \begin{minipage}[b]{.7\linewidth}
+  \begin{verbatim}
+reg [3:0] acc;
+wire [7:0] padded_diff;
+assign padded_diff = {diff, {8-WIDTH{1'b0}}};
+
+always @(posedge clk)
+  casex(padded_diff)
+    8'b1xxxxxxx: acc <= 4'h0;
+    8'b01xxxxxx: acc <= 4'h1;
+    8'b001xxxxx: acc <= 4'h2;
+    8'b0001xxxx: acc <= 4'h3;
+    8'b00001xxx: acc <= 4'h4;
+    8'b000001xx: acc <= 4'h5;
+    8'b0000001x: acc <= 4'h6;
+    8'b00000001: acc <= 4'h7;
+    8'b00000000: acc <= 4'h8;
+    default:     acc <= 4'h0;
+  endcase
+  \end{verbatim}
+  \caption{Verilog code for up to 8 bits CLZ}
+  \label{CLZVeri}
+  \end{minipage}
+\end{figure}
+
+To keep track of the minimum precision, register \texttt{minacc} is first initialised to the maximum, and then, for each smaller value observed, it will take on its smaller value.
 The comparison logic here is relatively expensive in this fast testbench design.
-As such, there is great incentive in the future to build a better communication method to allow offloading these operations to the HPS.
+To mitigate this, we can pipeline the comparison and write additional logic so that the results would become consistent a few cycles after the freeze signal has been asserted.
+Then we can add a ready signal in the scoreboard to indicate to the HPS when the values can be safely read.
+However, a much easier way is to offload these operations to the HPS, so there is great incentive in the future to build a better data transfer method to HPS.
 
 \begin{figure}[H]
   \centering
@@ -140,14 +169,18 @@ As such, there is great incentive in the future to build a better communication 
   \label{ScoreboardWave}
 \end{figure}
 
-Figure \ref{ScoreboardWave} shows a example waveform.
-The counters and the extrema trackers changes value only if we have \texttt{mon\_ready \&\& !freeze}.
+Figure \ref{ScoreboardWave} shows an example waveform.
+The counters and the extrema trackers change values only if \texttt{mon\_ready \&\& !freeze}.
 
 \section{Wrappers}
 
 Figure \ref{DBlock} provides a detailed look at how the individual hardware components are wired together to form the \texttt{testbench} module.
 The DUT is shown as internal for clarity and it is the case during simulation testing of the testbench, but it should be understood that the DUT module is external in actual use.
 The reference module similarly, is implied to be contained within the sub-monitor module, but this can be external during hardware use.
+
+Figure \ref{WrapperBlk} shows the block diagram when both the reference module and the DUT is external.
+The only differences this will make to Figure \ref{DBlock} is that instead of connecting to the DUT, \texttt{drive\_dut\_*} will be exported as \texttt{dut\_in\_*}, and \texttt{dut\_out} will be exported as \texttt{dut\_out} at the wrapper level.
+Similarly, for the reference module, \texttt{ref\_in\_*} and \texttt{ref\_out} are the exported signal from the sub-monitor.
 
 \begin{figure}[H]
   \centering
@@ -165,14 +198,14 @@ The reference module similarly, is implied to be contained within the sub-monito
   \end{figure}
 \end{sidewaysfigure}
 
-The inputs and outputs of this module is contained within \texttt{test\_wrapper}, which handles the AXI communications when coupled with the \texttt{hps} module.
-This allowed the software to access the testbench, completing the overall system implementation.
+The inputs and outputs of this module are contained within \texttt{test\_wrapper}, which handles the AXI communications when coupled with the \texttt{hps} module.
+This allows the software to access the testbench, completing the overall system implementation.
 In addition to the AXI interface, the conduits to external design and reference modules, we should also see that the wrapper has two clock inputs, since the AXI interface is clocked differently to the rest of the testbench.
 
 All I/O signals are given an address on the HPS-FPGA Bridge.
 They are listed as follows in Table \ref{MemLoc}.
-The prefix \texttt{I}, \texttt{O}, or \texttt{D} indicates that the register is write only, read only, or read/write respectively.
-All register names follow closely to that of the signal, except for \texttt{reset}, \texttt{enable}, and \texttt{freeze}, which has been collected into one \texttt{D\_CTRL} register.
+The prefix \texttt{I}, \texttt{O}, or \texttt{D} indicates that the register is write only, read only, or read/write, respectively.
+Each register name follows that of the corresponding signal closely, except for \texttt{reset}, \texttt{enable}, and \texttt{freeze}, which have been collected into one \texttt{D\_CTRL} register.
 They are bit 0, 1, and 2 of the register, respectively.
 
 \begin{table}[H]

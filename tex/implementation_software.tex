@@ -1,32 +1,32 @@
 \chapter{Software Implementation}
 
 \section{Accessing the FPGA}
-The interfaces are mapped onto the physical memory, thus they can be accessed by opening \texttt{/dev/mem} with the \texttt{mmap} library in the Python test script.
-The 4 bytes of binary data from the FPGA also needs to be packed or unpacked with the \texttt{struct} library, as they needs to be interpreted as unsigned long integers in little-endian.
+The interfaces are mapped onto the physical memory in the HPS, thus they can be accessed by opening \texttt{/dev/mem} with the \texttt{mmap} Python library in the software.
+The 4 bytes of binary data from the FPGA also need to be packed or unpacked with the \texttt{struct} library, as they need to be interpreted as unsigned long integers in little-endian format.
 The read and write function are defined in a class called \texttt{axi}.
-The base of this function is provided to me by my supervisor.
+The base of this function was provided to me by my supervisor.
 
-Since the design is to abstract away direct interactions with the memory locations in the test wrapper, another class called the \texttt{wrapper} is created to serve as a collection of useful read and write functions.
-Similarly, a class called \texttt{pll} is created to serve the same purpose, but for the PLL reconfiguration module.
+Since the design is to abstract away direct interactions with the memory locations in the test wrapper, another class called \texttt{wrapper} was created to serve as a collection of useful read and write functions.
+Similarly, a class called \texttt{pll} was created to serve the same purpose, but for the PLL reconfiguration module.
 The initial version of the \texttt{pll} class was provided to me by my supervisor, but it was then modified to provide more flexibility in frequency control.
 
 A brief summary of the PLL configuration is as follows.
-There are 3 reconfigurable stages from the input frequency $f_{in}$ to the output frequency $f_{out}$, called $M$, $N$, and $C$.
-$M$ is a multiplier, and $N$, and $C$ are dividers, or in an equation,
-$f_{out} = f_{in} \times \frac{M}{N \times C}$.
-Each stage can be individually bypassed, and there can be multiple parallel $C$ stages in a single PLL to provide multiple frequencies outputs.
+There are 3 reconfigurable stages from the input frequency $f_\text{in}$ to the output frequency $f_\text{out}$, called $M$, $N$, and $C$.
+$M$ is a multiplier, and $N$, and $C$ are dividers, or, in an equation,
+$f_\text{out} = f_\text{in} \times \frac{M}{N \times C}$.
+Each stage can be individually bypassed, and there are multiple $C$ stages in a single PLL to provide multiple output frequencies.
 
 Converting from the desired divisor or multiplier to binary write data is not trivial, but it can be written into a function as all the rules are stated in the user manual~\cite{Altera7}.
-After writing it in, the software waits for the hardware to finish configuring by watching another memory location, and then returns the frequency set.
-This may deviate from the desired frequency due to hardware limitations of the PLL.
+After writing in binary data in the required format, the software waits for the hardware to finish configuring by watching another memory location, and then returns the frequency set.
+This may deviate from the desired frequency due to hardware limitations on resolution from the PLL.
 
 To illustrate the abstraction, we can examine what happens when the user writes the command \texttt{reset} to reset the entire system.
 
-First the software calls the \texttt{cleanreset} function in class \texttt{wrapper}.
-This calls the a function to set the reset bit and then clears it.
+First, the software calls the \texttt{cleanreset} function in class \texttt{wrapper}.
+This calls a function to set the reset bit before clearing the same bit.
 It also clears the enable signal and the freeze signal.
-Then it writes all zeros to all driver filter control registers, completing the wrapper side reset.
-Then the software calls a function in class \texttt{pll}, which sets the PLL frequency back to the default value, thus fully resets the whole system.
+It then writes all zeros to all driver filter control registers, completing the wrapper-side reset.
+The software then calls a function in class \texttt{pll}, which sets the PLL frequency back to the default value, thus fully resetting the whole system.
 
 \section{Read-eval-print Loop}
 
@@ -46,7 +46,7 @@ These commands are made to be intuitive to the user, yet retaining all functiona
     manual <a|b> <hex> & Give input in manual mode. \\
     bitset <a|b> <hex> & Force bits to be 1 in auto mode. \\
     bitclr <a|b> <hex> & Force bits to be 0 in auto mode. \\
-    run <time>         & Runs the test for specified duration in ms. Prints the results at the end of the test. \\
+    run <time>         & Runs the test for the duration specified in seconds. Prints the results at the end of the test. \\
     exit               & Exits the REPL. \\
     \hline
   \end{tabular}
