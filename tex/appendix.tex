@@ -1,4 +1,4 @@
-\chapter{User Guide}
+\chapter{User Guide Provided to Test Volunteers}
 \label{appendix:guide}
 
 \section{Introduction}
@@ -84,11 +84,11 @@ In this guide we will be using rsync to upload the \texttt{/scripts} folder and 
 \begin{enumerate}
   \item Copy the \texttt{.rbf} file into \texttt{/scripts} and upload it with \texttt{rsync}.
 
-  \texttt{rsync -rtuv ./ root@ee-cy5soc3.ee.ic.ac.uk:/home/\line(1,0){30}/scripts}
+  \texttt{rsync -rtuv ./ \line(1,0){20}@\line(1,0){40}.ee.ic.ac.uk:/home/\line(1,0){30}/scripts}
   \item Connect to the board.
         (This can be done by using PuTTY on Windows or a ssh command on Linux.)
 
-  \texttt{ssh root@ee-cy5soc3.ee.ic.ac.uk}
+  \texttt{ssh \line(1,0){20}@\line(1,0){40}.ee.ic.ac.uk}
   \item Program the FPGA.
 
   \texttt{cd /home/\line(1,0){30}/scripts}
