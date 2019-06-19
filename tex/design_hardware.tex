@@ -154,7 +154,7 @@ However, if the randomiser is to be revisited in the future with more time budge
 \section{Driver}
 
 The driver should have two main types of operation when feeding data into the DUT.
-One is the stress testing mode, where the driver tries to pushes a new piece of data into the DUT at every clock tick.
+One is the stress testing mode, where the driver tries to push a new piece of data into the DUT at every clock tick.
 The alternative is a slow manual mode, where the driver reads from the HPS-FPGA bridge and changes its output to the DUT whenever a new test point is specified by the software.
 The stress testing mode will expose the DUT to as many random test points as possible in the test duration.
 The manual mode is used when the user has a special interest in a limited list of inputs.
@@ -203,7 +203,7 @@ The scoreboard will be frozen for all repeated inputs since in the subsequent in
 In addition to controlling what gets sent to the DUT, the driver has the responsibility to ensure that the monitor receives the test output from the DUT and the test inputs from the driver at the same time.
 After going through the filtering logic, the stream of test inputs will not only be sent to the DUT, but also sent to a shift register before reaching the monitor.
 The shift register will provide the delay required for the DUT to finish its operations.
-Since the number of cycle delays from input to output should be consistent and known by the user, the length of this delay can be configured before compiling the testbench.
+Since the delay in number of cycles from input to output should be consistent and known by the user, the length of this delay can be configured before compiling the testbench.
 
 
 \section{Monitor}
