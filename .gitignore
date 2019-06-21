@@ -6,3 +6,6 @@
 *.fls
 *.lof
 *.lot
+*.nav
+*.out
+*.snm

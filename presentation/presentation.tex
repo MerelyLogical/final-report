@@ -1,0 +1,121 @@
+\documentclass{beamer}
+
+\usepackage{cite}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[caption=false]{subfig}
+  \DeclareGraphicsExtensions{.png}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{url}
+\usepackage[edges]{forest}
+\usepackage{tikz}
+\usetikzlibrary{shapes,shapes.gates.logic.US,arrows,arrows.meta,chains,calc}
+\tikzset{
+  -|-/.style={
+    to path={
+      (\tikztostart) -| ($(\tikztostart)!#1!(\tikztotarget)$) |- (\tikztotarget)
+      \tikztonodes
+    }
+  },
+  -|-/.default=0.5,
+  |-|/.style={
+    to path={
+      (\tikztostart) |- ($(\tikztostart)!#1!(\tikztotarget)$) -| (\tikztotarget)
+      \tikztonodes
+    }
+  },
+  |-|/.default=0.5,
+}
+\usepackage{tikz-timing}
+\usetikztiminglibrary[new={char=Q,reset char=R}]{counters}
+\usepackage{bm,times}
+\usepackage{pgfgantt}
+\usepackage{indentfirst}
+\usepackage{array}
+\usepackage{setspace}
+\usepackage{caption}
+\usepackage{rotating}
+\usepackage{hyperref}
+
+%\usetheme{Boadilla}
+\usetheme{Singapore}
+\mode<presentation>
+{
+  \usetheme{default}   % or try Darmstadt, Madrid, Warsaw, ...
+  \usecolortheme{default} % or try albatross, beaver, crane, ...
+  \usefonttheme{default}  % or try serif, structurebold, ...
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamertemplate{caption}[numbered]
+}
+
+\title[AEFfEoAH]{An Extensible Framework\\for Evaluation of Arithmetic Hardware}
+\subtitle{}
+\author[Zifan Wang]{Zifan Wang \texorpdfstring{\\}{} Supervisor: Dr. James Davis}
+\institute[]{Imperial College London}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \tableofcontents
+\end{frame}
+
+\section{Background}
+\subsection{Motivation}
+\begin{frame}{Motivation}
+  \begin{itemize}
+  \item High-radix online arithmetic needs testbench
+  \item Digital designers all use their own testbench
+  \item Propose an extensible framework
+\end{itemize}
+\end{frame}
+
+\section{Design \& Implementation}
+\subsection{System}
+\begin{frame}{Proposed Architecture}
+\begin{itemize}
+  \item 
+\end{itemize}
+\end{frame}
+
+\subsection{Hardware}
+\begin{frame}{Hardware}
+\begin{itemize}
+  \item 
+\end{itemize}
+\end{frame}
+
+\subsection{Software}
+\begin{frame}{Software}
+\begin{itemize}
+  \item 
+\end{itemize}
+\end{frame}
+
+\section{Results}
+\subsection{Results}
+\begin{frame}{Results}
+\begin{itemize}
+  \item 
+\end{itemize}
+\end{frame}
+
+\section{Evaluation}
+\subsection{Evaluation}
+\begin{frame}{Evaluation}
+\begin{itemize}
+  \item 
+\end{itemize}
+\end{frame}
+
+\section{Summary}
+\begin{frame}{Thank you}
+Questions?
+\end{frame}
+
+\end{document}

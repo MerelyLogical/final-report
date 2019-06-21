@@ -10,13 +10,13 @@ This would hopefully allow more insights to be gained regarding the DUT, or it c
 
 To measure this, we can run \textit{TimeQuest} on the compiled design to obtain software estimations of the speed of the design.
 The worst case scenario is a 1100mV model running at 85$^\circ$C.
-Under this condition, the restricted $f_{max}$ is reported as 394.01MHz.
+Under this condition, the restricted $f_\text{max}$ is reported as 394.01MHz.
 However, software estimations are usually conservative, so hardware tests were run to complement the results.
 After compiling the design on to a FPGA, it was observed that the test was reasonably stable at 400MHz, but breaks frequently at 425MHz.
 
 Although this did not reach the initial goal of 600MHz set in the design phase of the project, it is still high enough to be capable of testing a wide range of designs.
 This number can be further optimised by pipelining the slowest signal paths and reducing the latency in each cycle.
-The initial $f_{max}$ estimation before the frequency optimisation was at 210MHz.
+The initial $f_\text{max}$ estimation before the frequency optimisation was at 210MHz.
 Because it is a relatively time consuming task with diminishing returns, and does not provide any functional improvement to the implementation, it was dropped for more important work once the milestone of 400MHz was reached.
 
 Overall this is still a satisfactory result, as the frequency still comfortably higher than that of the arithmetic unit, which was assumed to run at 300MHz.
