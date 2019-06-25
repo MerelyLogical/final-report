@@ -2,7 +2,7 @@
   for tree={
     align=center,
     font=\ttfamily,
-    edge+={thick, -{Stealth[]}},
+    edge+={thick},
     l sep'+=10pt,
     fork sep'=10pt,
   },
@@ -11,15 +11,15 @@
     inner xsep=0pt,
     tikz={\draw [thick] (.children first) -- (.children last);}
   }{},
-  [sys\_top
+  [\textbf{sys\_top}
     [reset]
     [debounce]
-    [soc\_system
-      [hps]
-      [pll]
-      [pll\_reconfig]
-      [test\_wrapper
-        [testbench
+    [\textbf{soc\_system}
+      [\textbf{hps}]
+      [\textbf{pll}]
+      [\textbf{pll\_reconfig}]
+      [\textbf{test\_wrapper}
+        [\textbf{testbench}
           [randomiser]
           [driver]
           [monitor
@@ -28,8 +28,8 @@
           [scoreboard]
         ]
       ]
-      [dut]
-      [ref]
+      [\textbf{dut}]
+      [\textbf{ref}]
       [...]
     ]
     [edge\_detector]

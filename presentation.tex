@@ -37,6 +37,9 @@
 \usepackage{caption}
 \usepackage{rotating}
 \usepackage{hyperref}
+\makeatletter
+\newcommand{\verbatimfont}[1]{\renewcommand{\verbatim@font}{\ttfamily#1}}
+\makeatother
 
 %\usetheme{Boadilla}
 \usetheme{Hannover}
@@ -49,7 +52,18 @@
   \setbeamertemplate{caption}[numbered]
 }
 
-\title[EFEAH]{An Extensible Framework\\for Evaluation of Arithmetic Hardware}
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+\title[AAA]{An Extensible Framework for\\At-Speed Evaluation of\\Arithmetic Hardware}
 \subtitle{}
 \author[Zifan Wang]{Zifan Wang \texorpdfstring{\\}{} Supervisor: Dr. James Davis}
 \institute[]{Imperial College London}
@@ -66,53 +80,39 @@
 \end{frame}
 
 \section{Background}
-\subsection{Motivation}
+
 \begin{frame}{Motivation}
   \begin{itemize}
     \item<+-> Started as a specialised evaluation system for high-radix online arithmetic units
     \begin{itemize}
-      \item At-speed
+      \item At-speed (Overclockable)
       \item Precision Checking
     \end{itemize}
     \item<+-> Digital designers all use their own testbenches
+    \item<+-> Ad hoc, one-time use, inefficient \newline
     \item<+-> Propose an extensible framework
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Motivation}
-  \begin{figure}[H]
-    \centering
-    \resizebox{\textwidth}{!}{%
-      \includegraphics{img/standards}
-    }
-  \end{figure}
-  \small{xkcd.com/927}
-\end{frame}
-
-\begin{frame}{Purpose}
-  \begin{itemize}
-    \item Design and Implement an evaluation framework
-    \begin{itemize}[<+->]
-      \item High maximum frequency
-      \item Controllable frequency
-      \item Provide information regarding precision of output
-      \item Flexible, customisable
+    \begin{itemize}
+      \item With variable frequency with a high maximum (Assume DUT @300MHz)
+      \item Extensible
       \item User-friendly
     \end{itemize}
   \end{itemize}
 \end{frame}
 
-\section[D\&I]{Design \& Implementation}
-\subsection{System}
+\section{Design \& Implementation}
 
 \begin{frame}{Hardware Choice}
   Cyclone V SX SoC Development Board
   \begin{figure}[H]
     \centering
-    \resizebox{\textwidth}{!}{%
+    \resizebox{0.8\textwidth}{!}{%
       \includegraphics{img/SoCStructure}
     }
   \end{figure}
+  \begin{itemize}
+    \item HPS -- user interaction and test control
+    \item FPGA -- actual hardware testing
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{System Architecture}
@@ -128,20 +128,129 @@
   \end{figure}
 \end{frame}
 
-\subsection{Hardware}
-\begin{frame}{Monitor Structure}
+\begin{frame}{System Architecture}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/tb_block}
+    }
+  \end{figure}
   \begin{itemize}
-    \item Lazy Monitor
-    \begin{itemize}
-      \item Randomly select data points to check
-    \end{itemize}
+    \item Software accepts user commands from files or command line
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{System Architecture}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/tb_block}
+    }
+  \end{figure}
+  \begin{itemize}
+    \item Randomiser generate random data with LFSRs
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{System Architecture}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/tb_block}
+    }
+  \end{figure}
+  \begin{itemize}
+    \item Driver filters inputs and drives them to the DUT and the monitor
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{System Architecture}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/tb_block}
+    }
+  \end{figure}
+  \begin{itemize}
+    \item Monitor watches for the differences between DUT and reference outputs
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{System Architecture}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/tb_block}
+    }
+  \end{figure}
+  \begin{itemize}
+    \item Scoreboard tallies them and provides results to software
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{System Architecture}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/tb_block}
+    }
+  \end{figure}
+  \begin{itemize}
+    \item Software reads results and present them to user
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Hardware Project Hierarchy}
+  \begin{itemize}[<+->]
+    \item Adapted from a golden system reference design
   \end{itemize}
   \begin{figure}[H]
     \centering
     \resizebox{0.8\textwidth}{!}{%
-      \input{illu/lazy_mon}
+      \input{illu/golden_ref_hierarchy}
     }
   \end{figure}
+  \begin{itemize}[<+->]
+    \item Already uses \textit{Qsys} for \texttt{soc\_system}
+    \item Frequency control uses \texttt{pll} (Phase-locked loop) and \texttt{pll\_reconfig} IP, easy integration with \textit{Qsys}.
+    \item Great interface for user to connect their design and reference modules
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Hardware Project Hierarchy}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/hierarchy}
+    }
+  \end{figure}
+  \begin{itemize}[<+->]
+    \item Access to software through \texttt{hps}
+    \item Access to hardware design through \texttt{dut} and \texttt{ref}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Providing test data}
+  \begin{itemize}
+    \item<+-> Assume DUT is 32-bit @300MHz, need sustained data input for stress testing \newline
+    \item<+-> Real time, on board generation of random test data
+    \begin{itemize}
+      \item Low effort, significant coverage, can discover subtle errors
+      \item Include filters to give user control
+      \item Accept manual inputs from users for critical path
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Relaxed Reference}
+  \begin{itemize}
+    \item Monitors needs reference module to check correctness
+    \item Has to be functionally correct
+    \item Sensible to have reduced timing requirements
+    \item Harder for users to make mistakes
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Monitor Structure}
@@ -159,28 +268,47 @@
   \end{figure}
 \end{frame}
 
-\subsection{Software}
-\begin{frame}{Software}
-\begin{itemize}
-  \item 
-\end{itemize}
+
+\begin{frame}{Software Design}
+  \begin{itemize}
+    \item<+-> Requirement
+    \begin{itemize}
+      \item Manual and auto input controls
+      \item Test duration
+      \item PLL frequency \newline
+    \end{itemize}
+    \item<+-> Considered solutions
+    \begin{itemize}
+      \item Test configuration files
+      \begin{itemize}
+        \item Easy to build and scale
+        \item Slightly harder to use and manage
+      \end{itemize}
+      \item Interactive REPL system
+      \begin{itemize}
+        \item Intuitive to control
+        \item Easy to automate and scale
+      \end{itemize}
+    \end{itemize}
+  \end{itemize}
 \end{frame}
 
 \section{Results}
-\subsection{Results}
 \begin{frame}{Results}
 \begin{itemize}
   \item<+-> Maximum frequency
   \begin{itemize}
     \item TimeQuest: 394.01MHz
     \item Hardware test: Stable at 400MHz; breaks at 425MHz
-    \item Can be pushed further, but stopped for time
+    \item DUT initially assume to work at 300MHz \newline
   \end{itemize}
   \item<+-> User-friendliness
   \begin{itemize}
     \item Performed an OOTB Testing
+    \item Knowledge of digital designs and testbenches
     \item No previous knowledge on Qsys or the framework
     \item Obtained results in 2 hours
+    \item No major interruptions, positive feedback \newline
   \end{itemize}
   \item<+-> Flexibility
 \end{itemize}
@@ -204,32 +332,57 @@
       \hline
     \end{tabular}
   \end{table}
-  \begin{itemize}
-    \item Auto mode filtering limited to bit-wise manipulation
-    \item No access to all precision data
-    \item 32-bit limit to many things
-  \end{itemize}
 \end{frame}
 
-
-\subsection{Demo}
 \begin{frame}{Demo}
   \begin{itemize}
     \item Shows the configuration process
     \item Shows software interaction
   \end{itemize}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|>{\ttfamily\scriptsize}p{8em}|>{\scriptsize}p{\dimexpr\textwidth-12em}|}
+      \hline
+      \textrm{Command}   & Explanation \\
+      \hline
+      reset              & Resets the system and test results. \\
+      version            & Prints the system version. \\
+      freq <speed>       & Sets the clock speed to the specified value in MHz. Prints the actual frequency configured. \\
+      mode <m|a>         & Choose between \underline{m}anual and \underline{a}uto test mode. \\
+      manual <a|b> <hex> & Give input in manual mode. \\
+      bitset <a|b> <hex> & Force bits to be 1 in auto mode. \\
+      bitclr <a|b> <hex> & Force bits to be 0 in auto mode. \\
+      run <time>         & Runs the test for the duration specified in seconds. Prints the results at the end of the test. \\
+      exit               & Exits the REPL. \\
+      \hline
+    \end{tabular}
+  \end{table}
 \end{frame}
 
 \section{Evaluation}
-\subsection{Evaluation}
-\begin{frame}{Limitations}
+
+\begin{frame}{What have we done?}
+  \begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+      \includegraphics{img/standards}
+    }
+  \end{figure}
+  \small{xkcd.com/927}
+\end{frame}
+
+\begin{frame}{Evaluation}
 \begin{itemize}
-  \item Limited customisability of current implementation
-  \item Tedious and error-prone 
-  \item Could be overcame with 2 improvements
-  \item Unified software system + Verilog preprocessor
-  \item Set up a more powerful HPS-FPGA communication system
-  \item Not limits to the extensibility of the framework
+  \item<+-> Limitations
+  \begin{itemize}
+    \item Customisability of current implementation
+  \end{itemize}
+  \item<+-> Improvements
+  \begin{itemize}
+    \item User experience can be made better with a unified software system + Verilog preprocessor
+    \item Set up a more powerful HPS-FPGA communication system to allow more insightful results \newline
+  \end{itemize}
+  \item<+-> Not limits to the extensibility of the framework
 \end{itemize}
 \end{frame}
 
@@ -238,6 +391,32 @@
 \end{frame}
 
 \section{Backup Slides}
+
+\begin{frame}{Providing test data}
+  \begin{itemize}
+    \item Assume 32-bit @600MHz, need sustained 19.2Gbps for stress testing
+    \item HPS-FPGA bridge
+    \begin{itemize}
+      \item Assume perfect packing and always burst transfer
+      \item 128-bit @133MHz, 17.0Gbps
+    \end{itemize}
+    \item Off-chip SDRAM
+    \begin{itemize}
+      \item Assume always burst, access pipelined
+      \item 32-bit DDR3 @400MHz, 25.6Gbps
+      \item Sufficient, but needs time to fill up
+      \item SDRAM controller can be complex to use and manage
+    \end{itemize}
+    \item On-chip memory
+    \begin{itemize}
+      \item Assume widest possible arrangement
+      \item 768.9kB @315MHz, 242Gbps
+      \item Very fast, but extremely small capacity for sustained load
+    \end{itemize}
+    \item Real time generation
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{LFSRs}
   \begin{figure}[H]
     \centering
@@ -260,17 +439,6 @@
   \end{figure}
 \end{frame}
 
-\begin{frame}{Monitor Structure}
-  \begin{figure}[H]
-    \centering
-    \input{illu/lazy_mon}
-  \end{figure}
-  \begin{figure}[H]
-    \centering
-    \input{illu/parallel_mon}
-  \end{figure}
-\end{frame}
-
 \begin{frame}{Hardware}
   \begin{figure}[H]
     \centering
@@ -279,4 +447,95 @@
     }
   \end{figure}
 \end{frame}
+
+\begin{frame}{Monitor Structure}
+  \begin{itemize}
+    \item Lazy Monitor
+    \begin{itemize}
+      \item Randomly selects data points to check
+    \end{itemize}
+  \end{itemize}
+  \begin{figure}[H]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+      \input{illu/lazy_mon}
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]
+  \frametitle{Software Design}
+  \begin{columns}
+  \column[t]{0.4\textwidth}
+  \verbatimfont{\footnotesize}%
+  \begin{verbatim}
+mode: auto
+bitset:
+  a: 00000001
+  b: 00000000
+bitclr:
+  a: 00000000
+  b: 00000001
+input:
+  - a: 00000000
+    b: 00000000
+freq: 200
+runtime: 60
+  \end{verbatim}
+  \column[t]{0.4\textwidth}
+  \verbatimfont{\footnotesize}%
+  \begin{verbatim}
+> mode auto
+> bitset a 00000001
+> bitclr b 00000001
+> freq 200
+PLL Configured to 200.00MHz
+> run 60
+Results: ...
+  \end{verbatim}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{REPL Commands}
+  \begin{table}[H]
+    \centering
+    \begin{tabular}{|>{\ttfamily\scriptsize}p{8em}|>{\scriptsize}p{\dimexpr\textwidth-12em}|}
+      \hline
+      \textrm{Command}   & Explanation \\
+      \hline
+      reset              & Resets the system and test results. \\
+      version            & Prints the system version. \\
+      freq <speed>       & Sets the clock speed to the specified value in MHz. Prints the actual frequency configured. \\
+      mode <m|a>         & Choose between \underline{m}anual and \underline{a}uto test mode. \\
+      manual <a|b> <hex> & Give input in manual mode. \\
+      bitset <a|b> <hex> & Force bits to be 1 in auto mode. \\
+      bitclr <a|b> <hex> & Force bits to be 0 in auto mode. \\
+      run <time>         & Runs the test for the duration specified in seconds. Prints the results at the end of the test. \\
+      exit               & Exits the REPL. \\
+      \hline
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}{Driver}
+  \centering
+  \resizebox{\textwidth}{!}{%
+    \input{illu/driver_wave}
+  }
+\end{frame}
+
+\begin{frame}{Monitor}
+  \centering
+  \resizebox{\textwidth}{!}{%
+    \input{illu/monitor_wave}
+  }
+\end{frame}
+
+\begin{frame}{Scoreboard}
+  \centering
+  \resizebox{\textwidth}{!}{%
+    \input{illu/scoreboard_wave}
+  }
+\end{frame}
+
 \end{document}

@@ -2,7 +2,7 @@
   for tree={
     align=center,
     font=\ttfamily,
-    edge+={thick, -{Stealth[]}},
+    edge+={thick},
     l sep'+=10pt,
     fork sep'=10pt,
   },
@@ -11,11 +11,11 @@
     inner xsep=0pt,
     tikz={\draw [thick] (.children first) -- (.children last);}
   }{},
-  [sys\_top
+  [\textbf{sys\_top}
     [reset]
     [debounce]
-    [soc\_system
-      [hps]
+    [\textbf{soc\_system}
+      [\textbf{hps}]
       [hps\_only\_master]
       [jtag\_uart]
       [button\_pio]
