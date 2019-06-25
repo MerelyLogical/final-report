@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[t]{beamer}
 
 \usepackage{cite}
 \usepackage{float}
@@ -69,28 +69,77 @@
 \subsection{Motivation}
 \begin{frame}{Motivation}
   \begin{itemize}
-  \item High-radix online arithmetic needs testbench
-  \item Digital designers all use their own testbench
-  \item Propose an extensible framework
-\end{itemize}
+    \item<+-> Started as a specialised evaluation system for high-radix online arithmetic units
+    \begin{itemize}
+      \item At-speed
+      \item Precision Checking
+    \end{itemize}
+    \item<+-> Digital designers all use their own testbenches
+    \item<+-> Propose an extensible framework
+  \end{itemize}
 \end{frame}
 
-\section{Design \& Implementation}
-\subsection{System}
-\begin{frame}[shrink]{System Architecture}
+\begin{frame}{Motivation}
   \begin{figure}[H]
     \centering
-    \input{illu/tb_block}
-    \label{Block}
+    \resizebox{\textwidth}{!}{%
+      \includegraphics{img/standards}
+    }
+  \end{figure}
+  \small{xkcd.com/927}
+\end{frame}
+
+\begin{frame}{Purpose}
+  \begin{itemize}
+    \item Design and Implement an evaluation framework
+    \begin{itemize}
+      \item<+-> High maximum frequency
+      \item<+-> Controllable frequency
+      \item<+-> Provide information regarding precision of output
+      \item<+-> Flexible, customisable
+      \item<+-> User-friendly
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section[D\&I]{Design \& Implementation}
+\subsection{System}
+
+\begin{frame}{Hardware Choice}
+  Cyclone V SX SoC Development Board
+  \begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+      \includegraphics{img/SoCStructure}
+    }
   \end{figure}
 \end{frame}
 
-\subsection{Hardware}
-\begin{frame}[shrink]{Hardware}
+\begin{frame}{System Architecture}
+  \begin{columns}
+  \column{0.4\textwidth}
+    \begin{itemize}
+    \item Inspired by UVM agent
+    \item Modular, thus extensible
+    \end{itemize}
+
+  \column{0.6\textwidth}
   \begin{figure}[H]
     \centering
-    \input{illu/detailed_block}
-    \label{DBlock}
+    \resizebox{\textwidth}{!}{%
+      \input{illu/tb_block}
+    }
+  \end{figure}
+  \end{columns}
+\end{frame}
+
+\subsection{Hardware}
+\begin{frame}{Hardware}
+  \begin{figure}[H]
+    \centering
+    \resizebox{\textwidth}{!}{%
+      \input{illu/detailed_block}
+    }
   \end{figure}
 \end{frame}
 
@@ -105,21 +154,69 @@
 \subsection{Results}
 \begin{frame}{Results}
 \begin{itemize}
-  \item 
+  \item Flexible
+  \item Robust
+  \item User-friendly
 \end{itemize}
+\end{frame}
+
+\subsection{Demo}
+\begin{frame}{Demo}
+  \begin{itemize}
+    \item Shows the configuration process
+    \item Shows software interaction
+  \end{itemize}
 \end{frame}
 
 \section{Evaluation}
 \subsection{Evaluation}
-\begin{frame}{Evaluation}
+\begin{frame}{Limitations}
 \begin{itemize}
-  \item 
+  \item Limited customisability of current implementation
+  \item Tedious and error-prone 
+  \item Could be overcame with 2 improvements
+  \item Unified software system + Verilog preprocessor
+  \item Set up a more powerful HPS-FPGA communication system
+  \item Not limits to the extensibility of the framework
 \end{itemize}
 \end{frame}
 
-\section{Summary}
 \begin{frame}{Thank you}
-Questions?
+  Questions?
+\end{frame}
+
+\section{Backup Slides}
+\begin{frame}{LFSRs}
+  \begin{figure}[H]
+    \centering
+    \input{illu/fibonacci}
+  \end{figure}
+  \begin{figure}[H]
+    \centering
+    \input{illu/galois}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Randomiser Structure}
+  \begin{figure}[H]
+    \centering
+    \input{illu/horilfsr}
+  \end{figure}
+  \begin{figure}[H]
+    \centering
+    \input{illu/vertlfsr}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Monitor Structure}
+  \begin{figure}[H]
+    \centering
+    \input{illu/lazy_mon}
+  \end{figure}
+  \begin{figure}[H]
+    \centering
+    \input{illu/parallel_mon}
+  \end{figure}
 \end{frame}
 
 \end{document}
