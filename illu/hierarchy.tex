@@ -11,21 +11,21 @@
     inner xsep=0pt,
     tikz={\draw [thick] (.children first) -- (.children last);}
   }{},
-  [\textbf{sys\_top}
+  [sys\_top
     [reset]
     [debounce]
-    [\textbf{soc\_system}
-      [\textbf{hps}]
+    [soc\_system
+      [hps]
       [\textbf{pll}]
       [\textbf{pll\_reconfig}]
       [\textbf{test\_wrapper}
         [\textbf{testbench}
-          [randomiser]
-          [driver]
-          [monitor
-            [sub\_mon]
+          [\textbf{randomiser}]
+          [\textbf{driver}]
+          [\textbf{monitor}
+            [\textbf{sub\_mon}]
           ]
-          [scoreboard]
+          [\textbf{scoreboard}]
         ]
       ]
       [\textbf{dut}]
